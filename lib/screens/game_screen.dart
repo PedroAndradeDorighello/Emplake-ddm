@@ -41,28 +41,16 @@ class GameScreen extends ConsumerWidget {
             width: double.infinity,
             color: scheme.secondaryContainer.withValues(alpha: 0.5),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(l10n.guestBanner, style: Theme.of(context).textTheme.bodySmall),
+            child: SelectableText(l10n.guestBanner, style: Theme.of(context).textTheme.bodySmall),
           ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: Row(
             children: [
-              Text(
-                '${l10n.puzzleNumber}: ${game.puzzle.number}',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
+              SelectableText(l10n.difficulty),
               const Spacer(),
-              Text('${l10n.score}: ${game.progress.score}'),
+              SelectableText('${l10n.score}: ${game.progress.score}'),
             ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(l10n.difficulty),
           ),
         ),
         SingleChildScrollView(
@@ -89,9 +77,10 @@ class GameScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Text(
+        SelectableText(
           l10n.selectSlot,
           style: Theme.of(context).textTheme.bodySmall,
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 12),
         Padding(
@@ -105,18 +94,11 @@ class GameScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          game.puzzle.displayExpression,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontFamily: 'monospace',
-              ),
-        ),
-        const SizedBox(height: 8),
         LatexPreview(expression: game.puzzle.displayExpression),
         if (game.feedback != VerifyFeedback.none)
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Text(
+            child: SelectableText(
               _feedback(l10n, game.feedback),
               style: TextStyle(
                 color: game.feedback == VerifyFeedback.correct
@@ -130,7 +112,7 @@ class GameScreen extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: Text(l10n.operatorsForLevel),
+            child: SelectableText(l10n.operatorsForLevel),
           ),
         ),
         Expanded(
@@ -139,7 +121,6 @@ class GameScreen extends ConsumerWidget {
             child: OperatorStamps(
               operators: game.puzzle.difficulty.operators,
               onStamp: ref.read(gameProvider.notifier).stamp,
-              onBackspace: ref.read(gameProvider.notifier).backspace,
             ),
           ),
         ),

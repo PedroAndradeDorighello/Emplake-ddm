@@ -20,8 +20,8 @@ class ScreenScale {
   double get pagePadding => compact ? 12 : 24;
 
   double digitSize(double boardWidth) {
-    final usable = boardWidth.clamp(260.0, 960.0);
-    return (usable / 8.2).clamp(42.0, 88.0);
+    final usable = boardWidth.isFinite ? boardWidth : 360.0;
+    return (usable / 9).clamp(36.0, 72.0);
   }
 
   static ScreenScale of(BuildContext context) =>

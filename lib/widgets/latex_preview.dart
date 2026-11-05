@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 
+import '../l10n/app_localizations.dart';
 import '../services/latex_converter.dart';
 import '../theme/screen_scale.dart';
 
@@ -32,8 +33,8 @@ class LatexPreview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'LaTeX',
+          SelectableText(
+            AppLocalizations.of(context).latexPreview,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: scheme.primary,
                   letterSpacing: 1.2,
@@ -49,7 +50,7 @@ class LatexPreview extends StatelessWidget {
                 fontSize: ScreenScale.of(context).compact ? 18 : 26,
                 color: scheme.onSurface,
               ),
-              onErrorFallback: (_) => Text(
+              onErrorFallback: (_) => SelectableText(
                 latex,
                 style: Theme.of(context).textTheme.titleMedium,
               ),

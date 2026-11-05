@@ -15,14 +15,17 @@ final _rootKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final auth = ref.watch(authProvider);
   final prefs = ref.watch(sharedPrefsProvider);
+  final refresh = ValueNotifier(0);
+  ref.onDispose(refresh.dispose);
+  ref.listen(authProvider, (previous, next) => refresh.value++);
 
   return GoRouter(
     navigatorKey: _rootKey,
     initialLocation: _restore(prefs) ?? '/login',
-    refreshListenable: _AuthListenable(ref),
+    refreshListenable: refresh,
     redirect: (context, state) {
+      final auth = ref.read(authProvider);
       final loggingIn = state.matchedLocation == '/login';
       if (auth == null && !loggingIn) return '/login';
       if (auth != null && loggingIn) return '/play';
@@ -72,9 +75,3 @@ Future<void> persistRoute(SharedPreferences prefs, String location) async {
   await prefs.setString('last_route', location);
 }
 
-class _AuthListenable extends ChangeNotifier {
-  _AuthListenable(this.ref) {
-    ref.listen(authProvider, (previous, next) => notifyListeners());
-  }
-  final Ref ref;
-}

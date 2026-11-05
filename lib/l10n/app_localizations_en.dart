@@ -22,13 +22,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signInEmail => 'Sign in with email';
 
   @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get orSignInWith => 'Or sign in with';
+
+  @override
   String get signInGoogle => 'Sign in with Google';
 
   @override
   String get signOut => 'Sign out';
 
   @override
-  String get continueAsGuest => 'Continue as guest (offline)';
+  String get continueAsGuest => 'Guest (offline)';
+
+  @override
+  String get authFieldsRequired => 'Enter email and password.';
+
+  @override
+  String get passwordTooShort => 'Password must be at least 6 characters.';
 
   @override
   String get email => 'Email';
@@ -157,7 +172,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpBody =>
-      'You get four digits in order. Stamp math operators into the slots so both sides of = are equal.\n\n• Tap a glowing slot, then tap an operator stamp.\n• Digits stay in order; empty slots concatenate (e.g. 34).\n• = starts in the middle — you can clear and move it.\n• Easy allows non-integer division; other levels do not.\n• Skip a tough number; solved ones will not appear again.';
+      'You get four digits in this order. Drag signs into the gaps before the first digit, between them, and after the last one, until both sides of = are equal.\n\n• The expression starts empty. = is not placed in the middle: put it where the equality makes sense.\n• An empty gap joins digits. 3 and 4 side by side make 34.\n• To remove a sign, drag it off the expression.\n• Easy adds square root, cube root, factorial, power, absolute value, floor, and ceiling. Only this level allows a non-integer division.\n• Intermediate drops floor and ceiling. Advanced keeps square root, factorial, and absolute value. Hard keeps +, −, ×, ÷, parentheses, and absolute value.\n• Skip replaces the number. Solved ones do not appear again.';
 
   @override
   String get operatorsForLevel => 'Operators for this level';

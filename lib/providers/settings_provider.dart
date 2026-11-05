@@ -12,7 +12,7 @@ class SettingsState {
     this.fontSize = 16,
     this.fontFamily = AppFontFamily.roboto,
     this.seedColor = const Color(0xFF0D7377),
-    this.preset = ThemePreset.ocean,
+    this.preset = ThemePreset.systemSeed,
     this.soundEnabled = false,
     this.locale = const Locale('pt'),
   });
@@ -30,7 +30,8 @@ class SettingsState {
         ThemePreset.ember => const Color(0xFFB85C38),
         ThemePreset.forest => const Color(0xFF2D6A4F),
         ThemePreset.slate => const Color(0xFF4A5568),
-        ThemePreset.custom || ThemePreset.systemSeed => seedColor,
+        ThemePreset.systemSeed => const Color(0xFF6750A4),
+        ThemePreset.custom => seedColor,
       };
 
   SettingsState copyWith({
@@ -66,7 +67,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     final fontSize = _prefs.getDouble('fontSize') ?? 16;
     final font = AppFontFamily.values[_prefs.getInt('fontFamily') ?? 0];
     final seed = Color(_prefs.getInt('seedColor') ?? 0xFF0D7377);
-    final preset = ThemePreset.values[_prefs.getInt('preset') ?? 1];
+    final preset = ThemePreset.values[_prefs.getInt('preset') ?? 0];
     final sound = _prefs.getBool('sound') ?? false;
     final lang = _prefs.getString('locale') ?? 'pt';
     state = SettingsState(
@@ -105,9 +106,9 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     _persist();
   }
 
-  void setSeedColor(Color c) {
+  void setSeedColor(Color c, {bool persist = true}) {
     state = state.copyWith(seedColor: c, preset: ThemePreset.custom);
-    _persist();
+    if (persist) _persist();
   }
 
   void setPreset(ThemePreset p) {

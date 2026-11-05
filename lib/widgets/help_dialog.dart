@@ -6,12 +6,12 @@ Future<void> showHelpDialog(BuildContext context) {
   return showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: Text(l10n.helpTitle),
-      content: SingleChildScrollView(child: Text(l10n.helpBody)),
+      title: SelectableText(l10n.helpTitle),
+      content: SingleChildScrollView(child: SelectableText(l10n.helpBody)),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(),
-          child: const Text('OK'),
+          child: Text(MaterialLocalizations.of(ctx).okButtonLabel),
         ),
       ],
     ),

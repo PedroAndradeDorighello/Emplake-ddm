@@ -122,6 +122,24 @@ abstract class AppLocalizations {
   /// **'Sign in with email'**
   String get signInEmail;
 
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signIn;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @orSignInWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Or sign in with'**
+  String get orSignInWith;
+
   /// No description provided for @signInGoogle.
   ///
   /// In en, this message translates to:
@@ -137,8 +155,20 @@ abstract class AppLocalizations {
   /// No description provided for @continueAsGuest.
   ///
   /// In en, this message translates to:
-  /// **'Continue as guest (offline)'**
+  /// **'Guest (offline)'**
   String get continueAsGuest;
+
+  /// No description provided for @authFieldsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email and password.'**
+  String get authFieldsRequired;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters.'**
+  String get passwordTooShort;
 
   /// No description provided for @email.
   ///
@@ -389,7 +419,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpBody.
   ///
   /// In en, this message translates to:
-  /// **'You get four digits in order. Stamp math operators into the slots so both sides of = are equal.\n\n• Tap a glowing slot, then tap an operator stamp.\n• Digits stay in order; empty slots concatenate (e.g. 34).\n• = starts in the middle — you can clear and move it.\n• Easy allows non-integer division; other levels do not.\n• Skip a tough number; solved ones will not appear again.'**
+  /// **'You get four digits in this order. Drag signs into the gaps before the first digit, between them, and after the last one, until both sides of = are equal.\n\n• The expression starts empty. = is not placed in the middle: put it where the equality makes sense.\n• An empty gap joins digits. 3 and 4 side by side make 34.\n• To remove a sign, drag it off the expression.\n• Easy adds square root, cube root, factorial, power, absolute value, floor, and ceiling. Only this level allows a non-integer division.\n• Intermediate drops floor and ceiling. Advanced keeps square root, factorial, and absolute value. Hard keeps +, −, ×, ÷, parentheses, and absolute value.\n• Skip replaces the number. Solved ones do not appear again.'**
   String get helpBody;
 
   /// No description provided for @operatorsForLevel.

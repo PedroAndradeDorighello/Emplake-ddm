@@ -40,13 +40,14 @@ class ForgeBoard extends StatelessWidget {
               ),
             );
           },
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 2,
-            runSpacing: 8,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _SlotChip(
+                height: digitSize * 1.15,
                 slot: SlotId.prefix,
                 raw: puzzle.prefix,
                 onTap: () => onSelect(SlotId.prefix),
@@ -56,6 +57,7 @@ class ForgeBoard extends StatelessWidget {
               ),
               _DigitIngot(digit: puzzle.digits[0], size: digitSize, color: scheme.primary),
               _SlotChip(
+                height: digitSize * 1.15,
                 slot: SlotId.mid0,
                 raw: puzzle.mids[0],
                 onTap: () => onSelect(SlotId.mid0),
@@ -64,22 +66,25 @@ class ForgeBoard extends StatelessWidget {
               ),
               _DigitIngot(digit: puzzle.digits[1], size: digitSize, color: scheme.primary),
               _SlotChip(
+                height: digitSize * 1.15,
                 slot: SlotId.mid1,
                 raw: puzzle.mids[1],
                 onTap: () => onSelect(SlotId.mid1),
                 onDrop: (drag) => onDrop(SlotId.mid1, drag),
                 onRemove: (index) => onRemove(SlotId.mid1, index),
               ),
-              _DigitIngot(digit: puzzle.digits[2], size: digitSize, color: scheme.tertiary),
+              _DigitIngot(digit: puzzle.digits[2], size: digitSize, color: scheme.primary),
               _SlotChip(
+                height: digitSize * 1.15,
                 slot: SlotId.mid2,
                 raw: puzzle.mids[2],
                 onTap: () => onSelect(SlotId.mid2),
                 onDrop: (drag) => onDrop(SlotId.mid2, drag),
                 onRemove: (index) => onRemove(SlotId.mid2, index),
               ),
-              _DigitIngot(digit: puzzle.digits[3], size: digitSize, color: scheme.tertiary),
+              _DigitIngot(digit: puzzle.digits[3], size: digitSize, color: scheme.primary),
               _SlotChip(
+                height: digitSize * 1.15,
                 slot: SlotId.suffix,
                 raw: puzzle.suffix,
                 onTap: () => onSelect(SlotId.suffix),
@@ -88,6 +93,7 @@ class ForgeBoard extends StatelessWidget {
                 hint: true,
               ),
             ],
+            ),
           ),
         );
       },
@@ -131,13 +137,19 @@ class _DigitIngot extends StatelessWidget {
           ),
         ],
       ),
-      child: Text(
-        '$digit',
-        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: FittedBox(
+          child: Text(
+            '$digit',
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w800,
-              shadows: const [Shadow(blurRadius: 4, color: Colors.black45)],
+              fontSize: 32,
+              shadows: [Shadow(blurRadius: 4, color: Colors.black45)],
             ),
+          ),
+        ),
       ),
     );
   }
@@ -145,6 +157,7 @@ class _DigitIngot extends StatelessWidget {
 
 class _SlotChip extends StatelessWidget {
   const _SlotChip({
+    required this.height,
     required this.slot,
     required this.raw,
     required this.onTap,
@@ -153,6 +166,7 @@ class _SlotChip extends StatelessWidget {
     this.hint = false,
   });
 
+  final double height;
   final SlotId slot;
   final String raw;
   final VoidCallback onTap;
@@ -171,33 +185,42 @@ class _SlotChip extends StatelessWidget {
       builder: (context, candidate, rejected) {
         final hovering = candidate.isNotEmpty;
         final empty = tokens.isEmpty;
-        final gap = empty ? (hint ? (compact ? 10.0 : 14.0) : (compact ? 22.0 : 28.0)) : 4.0;
+        final gap = empty
+            ? (hint ? (compact ? 36.0 : 48.0) : (compact ? 22.0 : 28.0))
+            : 4.0;
         return GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            constraints: BoxConstraints(minWidth: gap, minHeight: compact ? 48 : 64),
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(horizontal: empty ? 0 : 2),
+          child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               color: hovering ? scheme.secondary.withValues(alpha: 0.16) : null,
             ),
-            child: empty
-                ? SizedBox(width: gap, height: 2)
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (var i = 0; i < tokens.length; i++)
-                        _PlacedToken(
-                          slot: slot,
-                          index: i,
-                          op: tokens[i],
-                          onRemove: onRemove,
-                        ),
-                    ],
-                  ),
+            child: SizedBox(
+              height: height,
+              width: empty ? gap : null,
+              child: empty
+                  ? const SizedBox.shrink()
+                  : Align(
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          for (var i = 0; i < tokens.length; i++)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                              child: _PlacedToken(
+                                size: height / 1.15 * 0.78,
+                                slot: slot,
+                                index: i,
+                                op: tokens[i],
+                                onRemove: onRemove,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+            ),
           ),
         );
       },
@@ -207,12 +230,14 @@ class _SlotChip extends StatelessWidget {
 
 class _PlacedToken extends StatelessWidget {
   const _PlacedToken({
+    required this.size,
     required this.slot,
     required this.index,
     required this.op,
     required this.onRemove,
   });
 
+  final double size;
   final SlotId slot;
   final int index;
   final String op;
@@ -220,18 +245,29 @@ class _PlacedToken extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-          height: 1,
-        );
+    final tile = SizedBox(
+      width: size,
+      height: size * 1.15,
+      child: FittedBox(
+        child: Text(
+          op,
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 32,
+            height: 1,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
     return Draggable<OpDrag>(
       data: OpDrag.placed(op, slot, index),
       feedback: _OpFeedback(op: op),
-      childWhenDragging: Opacity(opacity: 0.25, child: Text(op, style: style)),
+      childWhenDragging: Opacity(opacity: 0.25, child: tile),
       onDragEnd: (details) {
         if (!details.wasAccepted) onRemove(index);
       },
-      child: Text(op, style: style),
+      child: tile,
     );
   }
 }
@@ -241,12 +277,10 @@ class OperatorStamps extends StatelessWidget {
     super.key,
     required this.operators,
     required this.onStamp,
-    required this.onBackspace,
   });
 
   final List<String> operators;
   final ValueChanged<String> onStamp;
-  final VoidCallback onBackspace;
 
   @override
   Widget build(BuildContext context) {
@@ -267,10 +301,6 @@ class OperatorStamps extends StatelessWidget {
               onTap: () => onStamp(op),
             ),
           ),
-        ActionChip(
-          label: const Icon(Icons.backspace_outlined, size: 18),
-          onPressed: onBackspace,
-        ),
       ],
     );
   }

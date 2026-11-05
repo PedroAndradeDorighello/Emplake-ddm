@@ -22,13 +22,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get signInEmail => 'Entrar com e-mail';
 
   @override
+  String get signIn => 'Entrar';
+
+  @override
+  String get register => 'Registrar';
+
+  @override
+  String get orSignInWith => 'Ou entre com';
+
+  @override
   String get signInGoogle => 'Entrar com Google';
 
   @override
   String get signOut => 'Sair';
 
   @override
-  String get continueAsGuest => 'Continuar como convidado (offline)';
+  String get continueAsGuest => 'Convidado (offline)';
+
+  @override
+  String get authFieldsRequired => 'Informe e-mail e senha.';
+
+  @override
+  String get passwordTooShort => 'A senha precisa ter pelo menos 6 caracteres.';
 
   @override
   String get email => 'E-mail';
@@ -157,7 +172,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get helpBody =>
-      'Você recebe quatro dígitos em ordem. Carimbe operadores matemáticos nos encaixes para que os dois lados de = fiquem iguais.\n\n• Toque num encaixe brilhante e depois num carimbo de operador.\n• Os dígitos mantêm a ordem; encaixe vazio concatena (ex.: 34).\n• O = começa no meio — você pode limpar e movê-lo.\n• Fácil permite divisão não inteira; os outros níveis não.\n• Pule um número difícil; os resolvidos não voltam a aparecer.';
+      'Você recebe quatro dígitos nesta ordem. Arraste sinais para os espaços antes do primeiro, entre eles e depois do último, até os dois lados do = ficarem iguais.\n\n• A expressão começa sem sinais. O = não vem no meio: coloque-o onde a igualdade fizer sentido.\n• Um espaço vazio junta os dígitos. 3 e 4 lado a lado formam 34.\n• Para remover um sinal, arraste-o para fora da expressão.\n• Fácil traz raiz quadrada, raiz cúbica, fatorial, potência, módulo, chão e teto. Só nesse nível a divisão pode não ser inteira.\n• Intermediário tira chão e teto. Avançado fica com raiz quadrada, fatorial e módulo. Difícil fica com +, −, ×, ÷, parênteses e módulo.\n• Pular troca o número. Os que você já resolveu não aparecem de novo.';
 
   @override
   String get operatorsForLevel => 'Operadores deste nível';

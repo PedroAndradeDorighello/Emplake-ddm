@@ -34,6 +34,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _emailAuth({required bool register}) async {
+    final l10n = AppLocalizations.of(context);
+    final email = _email.text.trim();
+    final password = _password.text;
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => _error = l10n.authFieldsRequired);
+      return;
+    }
+    if (register && password.length < 6) {
+      setState(() => _error = l10n.passwordTooShort);
+      return;
+    }
+
     setState(() {
       _busy = true;
       _error = null;
@@ -41,9 +53,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final auth = ref.read(authProvider.notifier);
       if (register) {
-        await auth.registerEmail(_email.text.trim(), _password.text);
+        await auth.registerEmail(email, password);
       } else {
-        await auth.signInEmail(_email.text.trim(), _password.text);
+        await auth.signInEmail(email, password);
       }
       if (mounted) context.go('/play');
     } on FirebaseAuthException catch (e) {
@@ -170,42 +182,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: 16),
         FilledButton(
           onPressed: _busy ? null : () => _emailAuth(register: false),
-          child: Text(l10n.signInEmail),
+          child: Text(l10n.signIn),
         ),
         const SizedBox(height: 8),
         OutlinedButton(
           onPressed: _busy ? null : () => _emailAuth(register: true),
-          child: const Text('Sign up / Registrar'),
+          child: Text(l10n.register),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            const Expanded(child: Divider()),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(l10n.orSignInWith),
+            ),
+            const Expanded(child: Divider()),
+          ],
+        ),
+        const SizedBox(height: 16),
         if (firebaseReady)
           OAuthProviderButton(
             provider: GoogleProvider(clientId: _googleWebClientId),
           )
         else
-          OutlinedButton(
-            onPressed: () {
-              ref.read(authProvider.notifier).continueAsGuest();
-              context.go('/play');
-            },
-            child: Text(l10n.signInGoogle),
+          OutlinedButton.icon(
+            onPressed: null,
+            icon: const Icon(Icons.g_mobiledata),
+            label: Text(l10n.signInGoogle),
           ),
         const SizedBox(height: 8),
-        TextButton(
+        OutlinedButton.icon(
           onPressed: _busy
               ? null
-              : () async {
-                  setState(() => _busy = true);
-                  try {
-                    await ref.read(authProvider.notifier).signInAnonymously();
-                    if (mounted) context.go('/play');
-                  } catch (e) {
-                    setState(() => _error = e.toString());
-                  } finally {
-                    if (mounted) setState(() => _busy = false);
-                  }
+              : () {
+                  ref.read(authProvider.notifier).continueAsGuest();
+                  context.go('/play');
                 },
-          child: Text(l10n.continueAsGuest),
+          icon: const Icon(Icons.person_outline),
+          label: Text(l10n.continueAsGuest),
         ),
       ],
     );

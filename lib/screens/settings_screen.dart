@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/leave_button.dart';
+import '../widgets/seed_color_wheel.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -58,28 +59,12 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Text(l10n.seedColor, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 10,
-            children: [
-              for (final c in const [
-                Color(0xFF0D7377),
-                Color(0xFFB85C38),
-                Color(0xFF2D6A4F),
-                Color(0xFF4A5568),
-                Color(0xFF1B4965),
-                Color(0xFF9A3412),
-              ])
-                InkWell(
-                  onTap: () => n.setSeedColor(c),
-                  child: CircleAvatar(
-                    backgroundColor: c,
-                    radius: 16,
-                    child: s.seedColor.toARGB32() == c.toARGB32()
-                        ? const Icon(Icons.check, size: 16, color: Colors.white)
-                        : null,
-                  ),
-                ),
-            ],
+          Center(
+            child: SeedColorWheel(
+              color: s.effectiveSeed,
+              onChanged: (c) => n.setSeedColor(c, persist: false),
+              onChangeEnd: n.setSeedColor,
+            ),
           ),
           const SizedBox(height: 24),
           Text('${l10n.fontSize}: ${s.fontSize.toStringAsFixed(0)}'),
