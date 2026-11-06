@@ -11,11 +11,13 @@ class LeaveButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final onHeader = Theme.of(context).appBarTheme.foregroundColor;
     return TextButton(
       onPressed: () async {
         await ref.read(authProvider.notifier).signOut();
         if (context.mounted) context.go('/login');
       },
+      style: TextButton.styleFrom(foregroundColor: onHeader),
       child: Text(l10n.signOut),
     );
   }

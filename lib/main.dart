@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
-import 'providers/game_provider.dart';
 import 'providers/settings_provider.dart';
 import 'router/app_router.dart';
 import 'services/progress_repository.dart';
@@ -51,6 +50,14 @@ class EmplakeApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final router = ref.watch(routerProvider);
+    ref.listen(authProvider, (previous, next) {
+      if (next == null || next.isGuest || previous?.uid == next.uid) return;
+      final uid = next.uid;
+      Future<void>(() async {
+        final route = await ref.read(settingsProvider.notifier).pullProfile(uid);
+        if (route != null) ref.read(routerProvider).go(route);
+      });
+    });
 
     return MaterialApp.router(
       title: 'Emplake',

@@ -392,6 +392,66 @@ abstract class AppLocalizations {
   /// **'Preset themes'**
   String get presetTheme;
 
+  /// No description provided for @schemeStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Color style'**
+  String get schemeStyle;
+
+  /// No description provided for @schemeTonalSpot.
+  ///
+  /// In en, this message translates to:
+  /// **'Tonal spot'**
+  String get schemeTonalSpot;
+
+  /// No description provided for @schemeFidelity.
+  ///
+  /// In en, this message translates to:
+  /// **'Fidelity'**
+  String get schemeFidelity;
+
+  /// No description provided for @schemeMonochrome.
+  ///
+  /// In en, this message translates to:
+  /// **'Monochrome'**
+  String get schemeMonochrome;
+
+  /// No description provided for @schemeNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Neutral'**
+  String get schemeNeutral;
+
+  /// No description provided for @schemeVibrant.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibrant'**
+  String get schemeVibrant;
+
+  /// No description provided for @schemeExpressive.
+  ///
+  /// In en, this message translates to:
+  /// **'Expressive'**
+  String get schemeExpressive;
+
+  /// No description provided for @schemeContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get schemeContent;
+
+  /// No description provided for @schemeRainbow.
+  ///
+  /// In en, this message translates to:
+  /// **'Rainbow'**
+  String get schemeRainbow;
+
+  /// No description provided for @schemeFruitSalad.
+  ///
+  /// In en, this message translates to:
+  /// **'Fruit salad'**
+  String get schemeFruitSalad;
+
   /// No description provided for @sound.
   ///
   /// In en, this message translates to:

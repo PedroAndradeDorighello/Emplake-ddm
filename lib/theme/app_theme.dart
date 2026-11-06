@@ -7,6 +7,7 @@ ThemeData buildTheme(SettingsState s, Brightness brightness) {
   final scheme = ColorScheme.fromSeed(
     seedColor: s.effectiveSeed,
     brightness: brightness,
+    dynamicSchemeVariant: s.schemeVariant,
   );
 
   final base = brightness == Brightness.dark
@@ -23,12 +24,11 @@ ThemeData buildTheme(SettingsState s, Brightness brightness) {
   return base.copyWith(
     colorScheme: scheme,
     textTheme: textTheme,
-    scaffoldBackgroundColor: brightness == Brightness.dark
-        ? const Color(0xFF0B1416)
-        : const Color(0xFFF3F6F5),
+    scaffoldBackgroundColor: scheme.surfaceContainerLow,
     appBarTheme: AppBarTheme(
-      backgroundColor: scheme.surface,
-      foregroundColor: scheme.onSurface,
+      backgroundColor: scheme.primary,
+      foregroundColor: scheme.onPrimary,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
     ),
     cardTheme: CardThemeData(

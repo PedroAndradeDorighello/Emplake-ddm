@@ -227,10 +227,6 @@ final soundServiceProvider = Provider<SoundService>((ref) {
   return s;
 });
 
-final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
-  throw UnimplementedError('override in main');
-});
-
 final gameProvider = StateNotifierProvider<GameNotifier, GameViewState>((ref) {
   return GameNotifier(
     ref,

@@ -159,6 +159,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get presetTheme => 'Preset themes';
 
   @override
+  String get schemeStyle => 'Color style';
+
+  @override
+  String get schemeTonalSpot => 'Tonal spot';
+
+  @override
+  String get schemeFidelity => 'Fidelity';
+
+  @override
+  String get schemeMonochrome => 'Monochrome';
+
+  @override
+  String get schemeNeutral => 'Neutral';
+
+  @override
+  String get schemeVibrant => 'Vibrant';
+
+  @override
+  String get schemeExpressive => 'Expressive';
+
+  @override
+  String get schemeContent => 'Content';
+
+  @override
+  String get schemeRainbow => 'Rainbow';
+
+  @override
+  String get schemeFruitSalad => 'Fruit salad';
+
+  @override
   String get sound => 'Sound';
 
   @override

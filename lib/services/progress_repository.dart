@@ -1,13 +1,20 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user_progress.dart';
 
+final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
+  throw UnimplementedError('override in main');
+});
+
 abstract class ProgressRepository {
   Future<UserProgress> load(String uid);
   Future<void> save(String uid, UserProgress progress);
+  Future<Map<String, dynamic>?> readProfile(String uid);
+  Future<void> mergeProfile(String uid, Map<String, dynamic> fields);
 }
 
 class LocalProgressRepository implements ProgressRepository {
@@ -28,6 +35,12 @@ class LocalProgressRepository implements ProgressRepository {
   Future<void> save(String uid, UserProgress progress) async {
     await _prefs.setString(_key(uid), jsonEncode(progress.toMap()));
   }
+
+  @override
+  Future<Map<String, dynamic>?> readProfile(String uid) async => null;
+
+  @override
+  Future<void> mergeProfile(String uid, Map<String, dynamic> fields) async {}
 }
 
 class FirestoreProgressRepository implements ProgressRepository {
@@ -56,5 +69,22 @@ class FirestoreProgressRepository implements ProgressRepository {
     } catch (_) {
       // offline / sem config — local já salvo
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> readProfile(String uid) async {
+    try {
+      final snap = await _db.collection('users').doc(uid).get();
+      return snap.data();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> mergeProfile(String uid, Map<String, dynamic> fields) async {
+    try {
+      await _db.collection('users').doc(uid).set(fields, SetOptions(merge: true));
+    } catch (_) {}
   }
 }

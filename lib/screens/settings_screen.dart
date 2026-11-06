@@ -6,6 +6,20 @@ import '../providers/settings_provider.dart';
 import '../widgets/leave_button.dart';
 import '../widgets/seed_color_wheel.dart';
 
+String _schemeLabel(AppLocalizations l10n, DynamicSchemeVariant variant) {
+  return switch (variant) {
+    DynamicSchemeVariant.tonalSpot => l10n.schemeTonalSpot,
+    DynamicSchemeVariant.fidelity => l10n.schemeFidelity,
+    DynamicSchemeVariant.monochrome => l10n.schemeMonochrome,
+    DynamicSchemeVariant.neutral => l10n.schemeNeutral,
+    DynamicSchemeVariant.vibrant => l10n.schemeVibrant,
+    DynamicSchemeVariant.expressive => l10n.schemeExpressive,
+    DynamicSchemeVariant.content => l10n.schemeContent,
+    DynamicSchemeVariant.rainbow => l10n.schemeRainbow,
+    DynamicSchemeVariant.fruitSalad => l10n.schemeFruitSalad,
+  };
+}
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -53,6 +67,21 @@ class SettingsScreen extends ConsumerWidget {
                   }),
                   selected: s.preset == p,
                   onSelected: (_) => n.setPreset(p),
+                ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Text(l10n.schemeStyle, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final variant in DynamicSchemeVariant.values)
+                ChoiceChip(
+                  label: Text(_schemeLabel(l10n, variant)),
+                  selected: s.schemeVariant == variant,
+                  onSelected: (_) => n.setScheme(variant),
                 ),
             ],
           ),

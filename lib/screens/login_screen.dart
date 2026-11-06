@@ -57,7 +57,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       } else {
         await auth.signInEmail(email, password);
       }
-      if (mounted) context.go('/play');
     } on FirebaseAuthException catch (e) {
       setState(() => _error = e.message ?? e.code);
     } catch (e) {

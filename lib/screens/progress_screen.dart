@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../models/user_progress.dart';
 import '../providers/auth_provider.dart';
 import '../providers/game_provider.dart';
+import '../services/progress_repository.dart';
 import '../widgets/custom_loader.dart';
 import '../widgets/leave_button.dart';
 

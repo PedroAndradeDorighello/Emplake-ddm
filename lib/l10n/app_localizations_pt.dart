@@ -159,6 +159,36 @@ class AppLocalizationsPt extends AppLocalizations {
   String get presetTheme => 'Temas prontos';
 
   @override
+  String get schemeStyle => 'Estilo de cor';
+
+  @override
+  String get schemeTonalSpot => 'Tonal';
+
+  @override
+  String get schemeFidelity => 'Fidelidade';
+
+  @override
+  String get schemeMonochrome => 'Monocromático';
+
+  @override
+  String get schemeNeutral => 'Neutro';
+
+  @override
+  String get schemeVibrant => 'Vibrante';
+
+  @override
+  String get schemeExpressive => 'Expressivo';
+
+  @override
+  String get schemeContent => 'Conteúdo';
+
+  @override
+  String get schemeRainbow => 'Arco-íris';
+
+  @override
+  String get schemeFruitSalad => 'Salada de frutas';
+
+  @override
   String get sound => 'Som';
 
   @override

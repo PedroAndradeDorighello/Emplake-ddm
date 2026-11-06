@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../l10n/app_localizations.dart';
+import '../providers/auth_provider.dart';
 import '../providers/settings_provider.dart';
 import '../router/app_router.dart';
+import '../services/progress_repository.dart';
 import '../theme/screen_scale.dart';
 import '../widgets/help_dialog.dart';
 
@@ -33,8 +35,12 @@ class _ShellScaffoldState extends ConsumerState<ShellScaffold> {
     final scheme = Theme.of(context).colorScheme;
     final prefs = ref.watch(sharedPrefsProvider);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      persistRoute(prefs, loc);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (prefs.getString('last_route') == loc) return;
+      await persistRoute(prefs, loc);
+      final auth = ref.read(authProvider);
+      if (auth == null || auth.isGuest || loc == '/login') return;
+      await ref.read(progressRepositoryProvider).mergeProfile(auth.uid, {'lastRoute': loc});
     });
 
     return Scaffold(
