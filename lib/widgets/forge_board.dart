@@ -230,7 +230,9 @@ class _SlotChip extends StatefulWidget {
 }
 
 class _SlotChipState extends State<_SlotChip> {
-  double get _tokenSize => widget.height / 1.15 * 0.78;
+  double get _tokenSize => widget.height / 1.15;
+
+  double get _glyph => _tokenSize * 0.78;
 
   /// Vão que realmente muda a expressão. O vão de origem não abre sombra nova.
   int? _openGap(int count) {
@@ -244,8 +246,8 @@ class _SlotChipState extends State<_SlotChip> {
   }
 
   double _restGap(int count, bool compact) {
-    if (count > 0) return 16;
-    return widget.hint ? (compact ? 36.0 : 48.0) : (compact ? 22.0 : 28.0);
+    if (count > 0) return _tokenSize * 0.62;
+    return widget.hint ? (compact ? 48.0 : 64.0) : (compact ? 36.0 : 48.0);
   }
 
   int _indexAt(Offset global, int count, bool compact) {
@@ -316,7 +318,7 @@ class _SlotChipState extends State<_SlotChip> {
                         width: open == i ? (gap > _tokenSize ? gap : _tokenSize) : gap,
                         height: widget.height,
                         op: open == i ? preview : null,
-                        size: _tokenSize,
+                        glyph: _glyph,
                         color: scheme.onSurface,
                       ),
                       _PlacedToken(
@@ -332,7 +334,7 @@ class _SlotChipState extends State<_SlotChip> {
                       width: open == tokens.length ? (gap > _tokenSize ? gap : _tokenSize) : gap,
                       height: widget.height,
                       op: open == tokens.length ? preview : null,
-                      size: _tokenSize,
+                      glyph: _glyph,
                       color: scheme.onSurface,
                     ),
                   ],
@@ -350,14 +352,14 @@ class _InsertGap extends StatelessWidget {
   const _InsertGap({
     required this.width,
     required this.height,
-    required this.size,
+    required this.glyph,
     required this.color,
     this.op,
   });
 
   final double width;
   final double height;
-  final double size;
+  final double glyph;
   final Color color;
   final String? op;
 
@@ -377,8 +379,8 @@ class _InsertGap extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: SizedBox(
-                    width: size,
-                    height: size * 1.15,
+                    width: glyph,
+                    height: glyph * 1.15,
                     child: FittedBox(
                       child: Text(
                         op!,
@@ -420,14 +422,20 @@ class _PlacedToken extends StatelessWidget {
     final tile = SizedBox(
       width: size,
       height: size * 1.15,
-      child: FittedBox(
-        child: Text(
-          op,
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: 32,
-            height: 1,
-            color: Theme.of(context).colorScheme.onSurface,
+      child: Center(
+        child: SizedBox(
+          width: size * 0.78,
+          height: size * 0.78 * 1.15,
+          child: FittedBox(
+            child: Text(
+              op,
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 32,
+                height: 1,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
           ),
         ),
       ),
@@ -461,8 +469,8 @@ class OperatorStamps extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: 10,
+      runSpacing: 10,
       alignment: WrapAlignment.center,
       children: [
         for (final op in operators)
@@ -497,11 +505,16 @@ class _OpFace extends StatelessWidget {
       child: InkWell(
         customBorder: const StadiumBorder(),
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: Text(
-            op,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 52, minHeight: 48),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            child: Center(
+              child: Text(
+                op,
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 22),
+              ),
+            ),
           ),
         ),
       ),
