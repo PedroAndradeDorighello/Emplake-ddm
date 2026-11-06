@@ -3,20 +3,16 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 const _wheelSize = 220.0;
-const _centerWell = 18.0;
 
-/// Cor na roda. O centro é branco; o anel varia matiz e saturação.
+/// Cor na roda. O centro tem saturação zero e usa o brilho da barra.
 Color seedColorAt(Offset local, double value, {double size = _wheelSize}) {
   final center = Offset(size / 2, size / 2);
   final radius = size / 2 - 4;
   final delta = local - center;
-  final dist = delta.distance;
-  if (dist <= _centerWell) return const Color(0xFFFFFFFF);
-  final clamped = dist.clamp(_centerWell, radius);
+  final dist = delta.distance.clamp(0.0, radius);
   var hue = math.atan2(delta.dy, delta.dx) * 180 / math.pi;
   if (hue < 0) hue += 360;
-  final saturation = ((clamped - _centerWell) / (radius - _centerWell)).clamp(0.0, 1.0);
-  return HSVColor.fromAHSV(1, hue, saturation, value).toColor();
+  return HSVColor.fromAHSV(1, hue, dist / radius, value).toColor();
 }
 
 class SeedColorWheel extends StatefulWidget {
@@ -153,9 +149,8 @@ class _WheelPainter extends CustomPainter {
       center,
       radius,
       Paint()
-        ..shader = RadialGradient(
-          colors: const [Colors.white, Color(0x00FFFFFF)],
-          stops: [_centerWell / radius, 1],
+        ..shader = const RadialGradient(
+          colors: [Colors.white, Color(0x00FFFFFF)],
         ).createShader(rect),
     );
     canvas.drawCircle(
@@ -167,19 +162,8 @@ class _WheelPainter extends CustomPainter {
     );
     canvas.restore();
 
-    canvas.drawCircle(center, _centerWell, Paint()..color = Colors.white);
-    canvas.drawCircle(
-      center,
-      _centerWell,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = Colors.black26,
-    );
-
     final rad = hsv.hue * math.pi / 180;
-    final reach = _centerWell + (radius - _centerWell) * hsv.saturation;
-    final marker = center + Offset(math.cos(rad), math.sin(rad)) * reach;
+    final marker = center + Offset(math.cos(rad), math.sin(rad)) * radius * hsv.saturation;
     canvas.drawCircle(marker, 9, Paint()..color = Colors.white);
     canvas.drawCircle(marker, 6, Paint()..color = hsv.toColor());
   }

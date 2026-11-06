@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('the center of the wheel is white', () {
+  test('the center follows the brightness and has no saturation', () {
     final color = seedColorAt(const Offset(110, 110), 0.2);
-    expect(color, const Color(0xFFFFFFFF));
+    final hsv = HSVColor.fromColor(color);
+    expect(hsv.saturation, 0);
+    expect(hsv.value, closeTo(0.2, 0.02));
   });
 
   test('the rim keeps the chosen brightness', () {

@@ -49,61 +49,13 @@ class SettingsScreen extends ConsumerWidget {
             onSelectionChanged: (v) => n.setThemeMode(v.first),
           ),
           const SizedBox(height: 16),
-          Card(
-            color: Theme.of(context).colorScheme.secondaryContainer,
-            child: SwitchListTile(
-              secondary: Icon(s.soundEnabled ? Icons.volume_up : Icons.volume_off),
-              title: Text(l10n.sound),
-              subtitle: Text(s.soundEnabled ? l10n.soundOn : l10n.soundOff),
-              value: s.soundEnabled,
-              onChanged: n.setSound,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(l10n.presetTheme, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final p in ThemePreset.values)
-                ChoiceChip(
-                  label: Text(switch (p) {
-                    ThemePreset.ocean => l10n.presetOcean,
-                    ThemePreset.ember => l10n.presetEmber,
-                    ThemePreset.forest => l10n.presetForest,
-                    ThemePreset.slate => l10n.presetSlate,
-                    ThemePreset.custom => l10n.presetCustom,
-                    ThemePreset.systemSeed => l10n.themeSystem,
-                  }),
-                  selected: s.preset == p,
-                  onSelected: (_) => n.setPreset(p),
-                ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(l10n.schemeStyle, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final variant in DynamicSchemeVariant.values)
-                ChoiceChip(
-                  label: Text(_schemeLabel(l10n, variant)),
-                  selected: s.schemeVariant == variant,
-                  onSelected: (_) => n.setScheme(variant),
-                ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(l10n.seedColor, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Center(
-            child: SeedColorWheel(
-              color: s.effectiveSeed,
-              onChanged: (c) => n.setSeedColor(c, persist: false),
-              onChangeEnd: n.setSeedColor,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilterChip(
+              avatar: Icon(s.soundEnabled ? Icons.volume_up : Icons.volume_off),
+              label: Text('${l10n.sound}: ${s.soundEnabled ? l10n.soundOn : l10n.soundOff}'),
+              selected: s.soundEnabled,
+              onSelected: n.setSound,
             ),
           ),
           const SizedBox(height: 24),
@@ -132,6 +84,61 @@ class SettingsScreen extends ConsumerWidget {
                   selected: s.fontFamily == f,
                   onSelected: (_) => n.setFontFamily(f),
                 ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Text(l10n.presetTheme, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final p in ThemePreset.values)
+                ChoiceChip(
+                  label: Text(switch (p) {
+                    ThemePreset.ocean => l10n.presetOcean,
+                    ThemePreset.ember => l10n.presetEmber,
+                    ThemePreset.forest => l10n.presetForest,
+                    ThemePreset.slate => l10n.presetSlate,
+                    ThemePreset.custom => l10n.presetCustom,
+                    ThemePreset.systemSeed => l10n.themeSystem,
+                  }),
+                  selected: s.preset == p,
+                  onSelected: (_) => n.setPreset(p),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ExpansionTile(
+            title: Text(l10n.moreThemeOptions),
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(l10n.schemeStyle, style: Theme.of(context).textTheme.titleMedium),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final variant in DynamicSchemeVariant.values)
+                    ChoiceChip(
+                      label: Text(_schemeLabel(l10n, variant)),
+                      selected: s.schemeVariant == variant,
+                      onSelected: (_) => n.setScheme(variant),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(l10n.seedColor, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Center(
+                child: SeedColorWheel(
+                  color: s.effectiveSeed,
+                  onChanged: (c) => n.setSeedColor(c, persist: false),
+                  onChangeEnd: n.setSeedColor,
+                ),
+              ),
             ],
           ),
         ],

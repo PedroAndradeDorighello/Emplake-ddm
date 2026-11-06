@@ -50,6 +50,7 @@
   "seedColor": "Seed color",
   "presetTheme": "Preset themes",
   "schemeStyle": "Color style",
+  "moreThemeOptions": "More theme options",
   "schemeTonalSpot": "Tonal spot",
   "schemeFidelity": "Fidelity",
   "schemeMonochrome": "Monochrome",

@@ -230,9 +230,7 @@ class _SlotChip extends StatefulWidget {
 }
 
 class _SlotChipState extends State<_SlotChip> {
-  double get _tokenSize => widget.height / 1.15;
-
-  double get _glyph => _tokenSize * 0.78;
+  double get _tokenSize => widget.height / 1.15 * 0.78;
 
   /// Vão que realmente muda a expressão. O vão de origem não abre sombra nova.
   int? _openGap(int count) {
@@ -246,8 +244,8 @@ class _SlotChipState extends State<_SlotChip> {
   }
 
   double _restGap(int count, bool compact) {
-    if (count > 0) return _tokenSize * 0.62;
-    return widget.hint ? (compact ? 48.0 : 64.0) : (compact ? 36.0 : 48.0);
+    if (count > 0) return 12;
+    return widget.hint ? (compact ? 36.0 : 48.0) : (compact ? 22.0 : 28.0);
   }
 
   int _indexAt(Offset global, int count, bool compact) {
@@ -318,7 +316,7 @@ class _SlotChipState extends State<_SlotChip> {
                         width: open == i ? (gap > _tokenSize ? gap : _tokenSize) : gap,
                         height: widget.height,
                         op: open == i ? preview : null,
-                        glyph: _glyph,
+                        glyph: _tokenSize,
                         color: scheme.onSurface,
                       ),
                       _PlacedToken(
@@ -334,7 +332,7 @@ class _SlotChipState extends State<_SlotChip> {
                       width: open == tokens.length ? (gap > _tokenSize ? gap : _tokenSize) : gap,
                       height: widget.height,
                       op: open == tokens.length ? preview : null,
-                      glyph: _glyph,
+                      glyph: _tokenSize,
                       color: scheme.onSurface,
                     ),
                   ],
@@ -422,20 +420,14 @@ class _PlacedToken extends StatelessWidget {
     final tile = SizedBox(
       width: size,
       height: size * 1.15,
-      child: Center(
-        child: SizedBox(
-          width: size * 0.78,
-          height: size * 0.78 * 1.15,
-          child: FittedBox(
-            child: Text(
-              op,
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 32,
-                height: 1,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
+      child: FittedBox(
+        child: Text(
+          op,
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 32,
+            height: 1,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ),
@@ -506,10 +498,10 @@ class _OpFace extends StatelessWidget {
         customBorder: const StadiumBorder(),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Text(
             op,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 22),
           ),
         ),
       ),

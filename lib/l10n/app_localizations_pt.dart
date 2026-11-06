@@ -162,6 +162,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get schemeStyle => 'Estilo de cor';
 
   @override
+  String get moreThemeOptions => 'Mais opções de tema';
+
+  @override
   String get schemeTonalSpot => 'Tonal';
 
   @override

@@ -398,6 +398,12 @@ abstract class AppLocalizations {
   /// **'Color style'**
   String get schemeStyle;
 
+  /// No description provided for @moreThemeOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'More theme options'**
+  String get moreThemeOptions;
+
   /// No description provided for @schemeTonalSpot.
   ///
   /// In en, this message translates to:
