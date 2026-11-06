@@ -2,7 +2,24 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-class SeedColorWheel extends StatelessWidget {
+const _wheelSize = 220.0;
+const _centerWell = 18.0;
+
+/// Cor na roda. O centro é branco; o anel varia matiz e saturação.
+Color seedColorAt(Offset local, double value, {double size = _wheelSize}) {
+  final center = Offset(size / 2, size / 2);
+  final radius = size / 2 - 4;
+  final delta = local - center;
+  final dist = delta.distance;
+  if (dist <= _centerWell) return const Color(0xFFFFFFFF);
+  final clamped = dist.clamp(_centerWell, radius);
+  var hue = math.atan2(delta.dy, delta.dx) * 180 / math.pi;
+  if (hue < 0) hue += 360;
+  final saturation = ((clamped - _centerWell) / (radius - _centerWell)).clamp(0.0, 1.0);
+  return HSVColor.fromAHSV(1, hue, saturation, value).toColor();
+}
+
+class SeedColorWheel extends StatefulWidget {
   const SeedColorWheel({
     super.key,
     required this.color,
@@ -15,55 +32,110 @@ class SeedColorWheel extends StatelessWidget {
   final ValueChanged<Color> onChangeEnd;
 
   @override
+  State<SeedColorWheel> createState() => _SeedColorWheelState();
+}
+
+class _SeedColorWheelState extends State<SeedColorWheel> {
+  late HSVColor _hsv;
+  bool _dragging = false;
+  ScrollHoldController? _releaseScroll;
+
+  @override
+  void initState() {
+    super.initState();
+    _hsv = HSVColor.fromColor(widget.color);
+  }
+
+  @override
+  void didUpdateWidget(SeedColorWheel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_dragging && widget.color != oldWidget.color) {
+      _hsv = HSVColor.fromColor(widget.color);
+    }
+  }
+
+  void _holdScroll() {
+    _releaseScroll ??= Scrollable.maybeOf(context)?.position.hold(() {});
+  }
+
+  void _dropScroll() {
+    _releaseScroll?.cancel();
+    _releaseScroll = null;
+  }
+
+  void _pick(Offset local) {
+    final next = seedColorAt(local, _hsv.value);
+    setState(() => _hsv = HSVColor.fromColor(next));
+    widget.onChanged(next);
+  }
+
+  void _finish() {
+    _dragging = false;
+    _dropScroll();
+    widget.onChangeEnd(_hsv.toColor());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final hsv = HSVColor.fromColor(color);
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         SizedBox(
-          width: 220,
-          height: 220,
-          child: GestureDetector(
-            onPanDown: (d) => onChanged(_colorAt(d.localPosition, hsv.value)),
-            onPanUpdate: (d) => onChanged(_colorAt(d.localPosition, hsv.value)),
-            onPanEnd: (_) => onChangeEnd(color),
+          width: _wheelSize,
+          height: _wheelSize,
+          child: Listener(
+            behavior: HitTestBehavior.opaque,
+            onPointerDown: (event) {
+              _dragging = true;
+              _holdScroll();
+              _pick(event.localPosition);
+            },
+            onPointerMove: (event) => _pick(event.localPosition),
+            onPointerUp: (_) => _finish(),
+            onPointerCancel: (_) => _finish(),
             child: CustomPaint(
-              painter: _WheelPainter(color),
-              size: const Size(220, 220),
+              painter: _WheelPainter(_hsv),
+              size: const Size(_wheelSize, _wheelSize),
             ),
           ),
         ),
-        Slider(
-          value: hsv.value,
-          onChanged: (v) => onChanged(hsv.withValue(v).toColor()),
-          onChangeEnd: (v) => onChangeEnd(hsv.withValue(v).toColor()),
+        Row(
+          children: [
+            Icon(Icons.brightness_low, color: scheme.onSurfaceVariant),
+            Expanded(
+              child: Slider(
+                value: _hsv.value,
+                onChanged: (v) {
+                  _dragging = true;
+                  setState(() => _hsv = _hsv.withValue(v));
+                  widget.onChanged(_hsv.toColor());
+                },
+                onChangeEnd: (v) {
+                  final next = _hsv.withValue(v);
+                  _dragging = false;
+                  setState(() => _hsv = next);
+                  widget.onChangeEnd(next.toColor());
+                },
+              ),
+            ),
+            Icon(Icons.brightness_high, color: scheme.onSurfaceVariant),
+          ],
         ),
       ],
     );
   }
-
-  Color _colorAt(Offset local, double value) {
-    const size = 220.0;
-    final center = const Offset(size / 2, size / 2);
-    final radius = size / 2 - 4;
-    final delta = local - center;
-    final dist = delta.distance.clamp(0.0, radius);
-    var hue = math.atan2(delta.dy, delta.dx) * 180 / math.pi;
-    if (hue < 0) hue += 360;
-    return HSVColor.fromAHSV(1, hue, dist / radius, value).toColor();
-  }
 }
 
 class _WheelPainter extends CustomPainter {
-  _WheelPainter(this.color);
+  _WheelPainter(this.hsv);
 
-  final Color color;
+  final HSVColor hsv;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.shortestSide / 2 - 4;
     final rect = Rect.fromCircle(center: center, radius: radius);
-    final hsv = HSVColor.fromColor(color);
 
     canvas.saveLayer(rect.inflate(2), Paint());
     canvas.drawCircle(
@@ -82,7 +154,8 @@ class _WheelPainter extends CustomPainter {
       radius,
       Paint()
         ..shader = RadialGradient(
-          colors: [Colors.white, const Color(0x00FFFFFF)],
+          colors: const [Colors.white, Color(0x00FFFFFF)],
+          stops: [_centerWell / radius, 1],
         ).createShader(rect),
     );
     canvas.drawCircle(
@@ -90,17 +163,27 @@ class _WheelPainter extends CustomPainter {
       radius,
       Paint()
         ..color = Colors.black.withValues(alpha: 1 - hsv.value)
-        ..blendMode = BlendMode.srcATop,
+        ..blendMode = BlendMode.srcOver,
     );
     canvas.restore();
 
+    canvas.drawCircle(center, _centerWell, Paint()..color = Colors.white);
+    canvas.drawCircle(
+      center,
+      _centerWell,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = Colors.black26,
+    );
+
     final rad = hsv.hue * math.pi / 180;
-    final marker = center +
-        Offset(math.cos(rad), math.sin(rad)) * radius * hsv.saturation;
+    final reach = _centerWell + (radius - _centerWell) * hsv.saturation;
+    final marker = center + Offset(math.cos(rad), math.sin(rad)) * reach;
     canvas.drawCircle(marker, 9, Paint()..color = Colors.white);
-    canvas.drawCircle(marker, 6, Paint()..color = color);
+    canvas.drawCircle(marker, 6, Paint()..color = hsv.toColor());
   }
 
   @override
-  bool shouldRepaint(covariant _WheelPainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(covariant _WheelPainter oldDelegate) => oldDelegate.hsv != hsv;
 }

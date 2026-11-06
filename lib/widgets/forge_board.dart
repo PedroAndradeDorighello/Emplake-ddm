@@ -469,8 +469,8 @@ class OperatorStamps extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 8,
+      runSpacing: 8,
       alignment: WrapAlignment.center,
       children: [
         for (final op in operators)
@@ -505,16 +505,11 @@ class _OpFace extends StatelessWidget {
       child: InkWell(
         customBorder: const StadiumBorder(),
         onTap: onTap,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 52, minHeight: 48),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-            child: Center(
-              child: Text(
-                op,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 22),
-              ),
-            ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Text(
+            op,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
           ),
         ),
       ),
