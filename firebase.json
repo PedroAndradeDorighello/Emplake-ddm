@@ -1,1 +1,55 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"emplake-ddm","appId":"1:726124199747:android:bf419f10cd12d9165bf9f6","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"emplake-ddm","configurations":{"android":"1:726124199747:android:bf419f10cd12d9165bf9f6","ios":"1:726124199747:ios:43b0f140052b9dd65bf9f6","macos":"1:726124199747:ios:43b0f140052b9dd65bf9f6","web":"1:726124199747:web:ca41be2b2a32d2785bf9f6","windows":"1:726124199747:web:0f873fecf964363b5bf9f6"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "emplake-ddm",
+          "appId": "1:726124199747:android:bf419f10cd12d9165bf9f6",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "emplake-ddm",
+          "configurations": {
+            "android": "1:726124199747:android:bf419f10cd12d9165bf9f6",
+            "ios": "1:726124199747:ios:43b0f140052b9dd65bf9f6",
+            "macos": "1:726124199747:ios:43b0f140052b9dd65bf9f6",
+            "web": "1:726124199747:web:ca41be2b2a32d2785bf9f6",
+            "windows": "1:726124199747:web:0f873fecf964363b5bf9f6"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "southamerica-east1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "auth": {
+    "providers": {
+      "anonymous": true,
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "emplake-ddm",
+        "supportEmail": "support@emplake-ddm.firebaseapp.com"
+      }
+    }
+  }
+}

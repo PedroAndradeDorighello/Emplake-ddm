@@ -109,13 +109,16 @@ class GameNotifier extends StateNotifier<GameViewState> {
     );
   }
 
-  void drop(SlotId target, OpDrag drag) {
-    var puzzle = state.puzzle;
-    if (!drag.fromPalette) {
-      puzzle = puzzle.removeAt(drag.slot!, drag.index!);
-    }
-    puzzle = puzzle.dropOn(target, drag.op);
-    state = state.copyWith(puzzle: puzzle, feedback: VerifyFeedback.none);
+  void drop(SlotId target, OpDrag drag, int index) {
+    final next = state.puzzle.place(
+      target,
+      index,
+      drag.op,
+      from: drag.slot,
+      fromIndex: drag.index,
+    );
+    if (identical(next, state.puzzle)) return;
+    state = state.copyWith(puzzle: next, feedback: VerifyFeedback.none);
   }
 
   void removePlaced(SlotId slot, int index) {

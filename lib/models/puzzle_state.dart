@@ -82,8 +82,25 @@ class PuzzleState {
         SlotId.mid2 => copyWith(mids: [mids[0], mids[1], text]),
       };
 
-  PuzzleState dropOn(SlotId target, String op) {
-    return copyWith(selectedSlot: target).withSlot(target, textOf(target) + op);
+  PuzzleState insertAt(SlotId target, int index, String op) {
+    final tokens = tokenize(textOf(target));
+    final at = index.clamp(0, tokens.length);
+    tokens.insert(at, op);
+    return copyWith(selectedSlot: target).withSlot(target, tokens.join());
+  }
+
+  /// [index] é a posição na lista antes de remover a origem.
+  PuzzleState place(SlotId target, int index, String op, {SlotId? from, int? fromIndex}) {
+    if (from != null && fromIndex != null && from == target) {
+      if (index == fromIndex || index == fromIndex + 1) return this;
+    }
+    var next = this;
+    var dest = index;
+    if (from != null && fromIndex != null) {
+      next = next.removeAt(from, fromIndex);
+      if (from == target && fromIndex < dest) dest -= 1;
+    }
+    return next.insertAt(target, dest, op);
   }
 
   PuzzleState removeAt(SlotId slot, int index) {
