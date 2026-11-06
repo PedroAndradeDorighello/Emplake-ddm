@@ -51,11 +51,17 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerLeft,
-            child: FilterChip(
-              avatar: Icon(s.soundEnabled ? Icons.volume_up : Icons.volume_off),
-              label: Text('${l10n.sound}: ${s.soundEnabled ? l10n.soundOn : l10n.soundOff}'),
-              selected: s.soundEnabled,
-              onSelected: n.setSound,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(s.soundEnabled ? Icons.volume_up : Icons.volume_off),
+                const SizedBox(width: 8),
+                Text(l10n.sound),
+                Switch(
+                  value: s.soundEnabled,
+                  onChanged: n.setSound,
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),

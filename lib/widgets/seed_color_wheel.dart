@@ -153,14 +153,12 @@ class _WheelPainter extends CustomPainter {
           colors: [Colors.white, Color(0x00FFFFFF)],
         ).createShader(rect),
     );
+    canvas.restore();
     canvas.drawCircle(
       center,
       radius,
-      Paint()
-        ..color = Colors.black.withValues(alpha: 1 - hsv.value)
-        ..blendMode = BlendMode.srcOver,
+      Paint()..color = Colors.black.withValues(alpha: 1 - hsv.value),
     );
-    canvas.restore();
 
     final rad = hsv.hue * math.pi / 180;
     final marker = center + Offset(math.cos(rad), math.sin(rad)) * radius * hsv.saturation;
