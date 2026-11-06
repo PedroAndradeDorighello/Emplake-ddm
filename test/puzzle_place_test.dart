@@ -25,6 +25,13 @@ void main() {
     expect(next.mids[0], '-+');
   });
 
+  test('the original gap is not a new position', () {
+    expect(PuzzleState.sameSpot(SlotId.mid0, 1, from: SlotId.mid0, fromIndex: 1), isTrue);
+    expect(PuzzleState.sameSpot(SlotId.mid0, 2, from: SlotId.mid0, fromIndex: 1), isTrue);
+    expect(PuzzleState.sameSpot(SlotId.mid0, 0, from: SlotId.mid0, fromIndex: 1), isFalse);
+    expect(PuzzleState.sameSpot(SlotId.mid1, 0, from: SlotId.mid0, fromIndex: 1), isFalse);
+  });
+
   test('dropping on the same spot does not shuffle', () {
     final start = board('+-');
     final next = start.place(

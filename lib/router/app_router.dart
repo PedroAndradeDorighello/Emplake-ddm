@@ -19,6 +19,8 @@ final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier(0);
   ref.onDispose(refresh.dispose);
   ref.listen(authProvider, (previous, next) => refresh.value++);
+  // A primeira sessão autenticada sai do login. Voltar no navegador pode ficar lá.
+  var leftLogin = false;
 
   return GoRouter(
     navigatorKey: _rootKey,
@@ -28,7 +30,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       final auth = ref.read(authProvider);
       final loggingIn = state.matchedLocation == '/login';
       if (auth == null && !loggingIn) return '/login';
-      if (auth != null && loggingIn) return '/play';
+      if (auth != null && loggingIn && !leftLogin) {
+        leftLogin = true;
+        return _restore(prefs) ?? '/play';
+      }
       return null;
     },
     routes: [

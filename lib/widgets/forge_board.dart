@@ -4,7 +4,7 @@ import '../models/puzzle_state.dart';
 import '../theme/screen_scale.dart';
 
 /// UI única: "Forja de equações" — dígitos em lingotes, encaixes como moldes.
-class ForgeBoard extends StatelessWidget {
+class ForgeBoard extends StatefulWidget {
   const ForgeBoard({
     super.key,
     required this.puzzle,
@@ -21,13 +21,57 @@ class ForgeBoard extends StatelessWidget {
   final void Function(SlotId slot, int index) onRemove;
 
   @override
+  State<ForgeBoard> createState() => _ForgeBoardState();
+}
+
+class _DragGhost extends ChangeNotifier {
+  SlotId? slot;
+  int? index;
+  OpDrag? drag;
+
+  void hover(SlotId slot, int index, OpDrag drag) {
+    if (this.slot == slot && this.index == index && _sameDrag(this.drag, drag)) return;
+    this.slot = slot;
+    this.index = index;
+    this.drag = drag;
+    notifyListeners();
+  }
+
+  void leave(SlotId slot) {
+    if (this.slot != slot) return;
+    clear();
+  }
+
+  void clear() {
+    if (slot == null && drag == null) return;
+    slot = null;
+    index = null;
+    drag = null;
+    notifyListeners();
+  }
+}
+
+bool _sameDrag(OpDrag? a, OpDrag? b) =>
+    a?.op == b?.op && a?.slot == b?.slot && a?.index == b?.index;
+
+class _ForgeBoardState extends State<ForgeBoard> {
+  final _ghost = _DragGhost();
+
+  @override
+  void dispose() {
+    _ghost.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final puzzle = widget.puzzle;
     final scheme = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
         final digitSize = ScreenScale.of(context).digitSize(constraints.maxWidth);
         return TweenAnimationBuilder<double>(
-          key: ValueKey(resetKey),
+          key: ValueKey(widget.resetKey),
           tween: Tween(begin: 0, end: 1),
           duration: const Duration(milliseconds: 520),
           curve: Curves.easeOutBack,
@@ -50,9 +94,10 @@ class ForgeBoard extends StatelessWidget {
                 height: digitSize * 1.15,
                 slot: SlotId.prefix,
                 raw: puzzle.prefix,
-                onTap: () => onSelect(SlotId.prefix),
-                onDrop: (drag, index) => onDrop(SlotId.prefix, drag, index),
-                onRemove: (index) => onRemove(SlotId.prefix, index),
+                ghost: _ghost,
+                onTap: () => widget.onSelect(SlotId.prefix),
+                onDrop: (drag, index) => widget.onDrop(SlotId.prefix, drag, index),
+                onRemove: (index) => widget.onRemove(SlotId.prefix, index),
                 hint: true,
               ),
               _DigitIngot(digit: puzzle.digits[0], size: digitSize, color: scheme.primary),
@@ -60,36 +105,40 @@ class ForgeBoard extends StatelessWidget {
                 height: digitSize * 1.15,
                 slot: SlotId.mid0,
                 raw: puzzle.mids[0],
-                onTap: () => onSelect(SlotId.mid0),
-                onDrop: (drag, index) => onDrop(SlotId.mid0, drag, index),
-                onRemove: (index) => onRemove(SlotId.mid0, index),
+                ghost: _ghost,
+                onTap: () => widget.onSelect(SlotId.mid0),
+                onDrop: (drag, index) => widget.onDrop(SlotId.mid0, drag, index),
+                onRemove: (index) => widget.onRemove(SlotId.mid0, index),
               ),
               _DigitIngot(digit: puzzle.digits[1], size: digitSize, color: scheme.primary),
               _SlotChip(
                 height: digitSize * 1.15,
                 slot: SlotId.mid1,
                 raw: puzzle.mids[1],
-                onTap: () => onSelect(SlotId.mid1),
-                onDrop: (drag, index) => onDrop(SlotId.mid1, drag, index),
-                onRemove: (index) => onRemove(SlotId.mid1, index),
+                ghost: _ghost,
+                onTap: () => widget.onSelect(SlotId.mid1),
+                onDrop: (drag, index) => widget.onDrop(SlotId.mid1, drag, index),
+                onRemove: (index) => widget.onRemove(SlotId.mid1, index),
               ),
               _DigitIngot(digit: puzzle.digits[2], size: digitSize, color: scheme.primary),
               _SlotChip(
                 height: digitSize * 1.15,
                 slot: SlotId.mid2,
                 raw: puzzle.mids[2],
-                onTap: () => onSelect(SlotId.mid2),
-                onDrop: (drag, index) => onDrop(SlotId.mid2, drag, index),
-                onRemove: (index) => onRemove(SlotId.mid2, index),
+                ghost: _ghost,
+                onTap: () => widget.onSelect(SlotId.mid2),
+                onDrop: (drag, index) => widget.onDrop(SlotId.mid2, drag, index),
+                onRemove: (index) => widget.onRemove(SlotId.mid2, index),
               ),
               _DigitIngot(digit: puzzle.digits[3], size: digitSize, color: scheme.primary),
               _SlotChip(
                 height: digitSize * 1.15,
                 slot: SlotId.suffix,
                 raw: puzzle.suffix,
-                onTap: () => onSelect(SlotId.suffix),
-                onDrop: (drag, index) => onDrop(SlotId.suffix, drag, index),
-                onRemove: (index) => onRemove(SlotId.suffix, index),
+                ghost: _ghost,
+                onTap: () => widget.onSelect(SlotId.suffix),
+                onDrop: (drag, index) => widget.onDrop(SlotId.suffix, drag, index),
+                onRemove: (index) => widget.onRemove(SlotId.suffix, index),
                 hint: true,
               ),
             ],
@@ -160,6 +209,7 @@ class _SlotChip extends StatefulWidget {
     required this.height,
     required this.slot,
     required this.raw,
+    required this.ghost,
     required this.onTap,
     required this.onDrop,
     required this.onRemove,
@@ -169,6 +219,7 @@ class _SlotChip extends StatefulWidget {
   final double height;
   final SlotId slot;
   final String raw;
+  final _DragGhost ghost;
   final VoidCallback onTap;
   final void Function(OpDrag drag, int index) onDrop;
   final ValueChanged<int> onRemove;
@@ -179,9 +230,18 @@ class _SlotChip extends StatefulWidget {
 }
 
 class _SlotChipState extends State<_SlotChip> {
-  int? _hover;
-
   double get _tokenSize => widget.height / 1.15 * 0.78;
+
+  /// Vão que realmente muda a expressão. O vão de origem não abre sombra nova.
+  int? _openGap(int count) {
+    final ghost = widget.ghost;
+    if (ghost.slot != widget.slot || ghost.index == null || ghost.drag == null) return null;
+    final index = ghost.index!.clamp(0, count);
+    if (PuzzleState.sameSpot(widget.slot, index, from: ghost.drag!.slot, fromIndex: ghost.drag!.index)) {
+      return null;
+    }
+    return index;
+  }
 
   double _restGap(int count, bool compact) {
     if (count > 0) return 16;
@@ -194,9 +254,10 @@ class _SlotChipState extends State<_SlotChip> {
     final x = box.globalToLocal(global).dx;
     final gap = _restGap(count, compact);
     final tokenW = _tokenSize;
+    final open = _openGap(count);
     var cursor = 0.0;
     for (var i = 0; i <= count; i++) {
-      final gapW = _hover == i ? (gap > tokenW ? gap : tokenW) : gap;
+      final gapW = open == i ? (gap > tokenW ? gap : tokenW) : gap;
       if (i == count) return count;
       final mid = cursor + gapW + tokenW / 2;
       if (x < mid) return i;
@@ -205,67 +266,80 @@ class _SlotChipState extends State<_SlotChip> {
     return count;
   }
 
+  bool _movedAway(int index) {
+    final ghost = widget.ghost;
+    final drag = ghost.drag;
+    if (drag == null || drag.slot != widget.slot || drag.index != index) return false;
+    if (ghost.slot == null || ghost.index == null) return false;
+    return !PuzzleState.sameSpot(
+      ghost.slot!,
+      ghost.index!,
+      from: drag.slot,
+      fromIndex: drag.index,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final compact = ScreenScale.of(context).compact;
-    final tokens = PuzzleState.tokenize(widget.raw);
-    final gap = _restGap(tokens.length, compact);
+    return ListenableBuilder(
+      listenable: widget.ghost,
+      builder: (context, _) {
+        final scheme = Theme.of(context).colorScheme;
+        final compact = ScreenScale.of(context).compact;
+        final tokens = PuzzleState.tokenize(widget.raw);
+        final gap = _restGap(tokens.length, compact);
+        final open = _openGap(tokens.length);
+        final preview = open == null ? null : widget.ghost.drag?.op;
 
-    return DragTarget<OpDrag>(
-      onMove: (details) {
-        final next = _indexAt(details.offset, tokens.length, compact);
-        if (next != _hover) setState(() => _hover = next);
-      },
-      onLeave: (_) {
-        if (_hover != null) setState(() => _hover = null);
-      },
-      onAcceptWithDetails: (details) {
-        final index = _indexAt(details.offset, tokens.length, compact);
-        setState(() => _hover = null);
-        widget.onDrop(details.data, index);
-      },
-      builder: (context, candidate, rejected) {
-        final hovering = candidate.isNotEmpty;
-        final preview = hovering ? candidate.first?.op : null;
-        return GestureDetector(
-          onTap: widget.onTap,
-          behavior: HitTestBehavior.opaque,
-          child: SizedBox(
-            height: widget.height,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (var i = 0; i < tokens.length; i++) ...[
-                  _InsertGap(
-                    width: _hover == i && preview != null
-                        ? (gap > _tokenSize ? gap : _tokenSize)
-                        : gap,
-                    height: widget.height,
-                    op: _hover == i ? preview : null,
-                    size: _tokenSize,
-                    color: scheme.onSurface,
-                  ),
-                  _PlacedToken(
-                    size: _tokenSize,
-                    slot: widget.slot,
-                    index: i,
-                    op: tokens[i],
-                    onRemove: widget.onRemove,
-                  ),
-                ],
-                _InsertGap(
-                  width: _hover == tokens.length && preview != null
-                      ? (gap > _tokenSize ? gap : _tokenSize)
-                      : gap,
-                  height: widget.height,
-                  op: _hover == tokens.length ? preview : null,
-                  size: _tokenSize,
-                  color: scheme.onSurface,
+        return DragTarget<OpDrag>(
+          onMove: (details) {
+            final next = _indexAt(details.offset, tokens.length, compact);
+            widget.ghost.hover(widget.slot, next, details.data);
+          },
+          onLeave: (_) => widget.ghost.leave(widget.slot),
+          onAcceptWithDetails: (details) {
+            final index = _indexAt(details.offset, tokens.length, compact);
+            widget.ghost.clear();
+            widget.onDrop(details.data, index);
+          },
+          builder: (context, candidate, rejected) {
+            return GestureDetector(
+              onTap: widget.onTap,
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                height: widget.height,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (var i = 0; i < tokens.length; i++) ...[
+                      _InsertGap(
+                        width: open == i ? (gap > _tokenSize ? gap : _tokenSize) : gap,
+                        height: widget.height,
+                        op: open == i ? preview : null,
+                        size: _tokenSize,
+                        color: scheme.onSurface,
+                      ),
+                      _PlacedToken(
+                        size: _tokenSize,
+                        slot: widget.slot,
+                        index: i,
+                        op: tokens[i],
+                        onRemove: widget.onRemove,
+                        hideShadow: _movedAway(i),
+                      ),
+                    ],
+                    _InsertGap(
+                      width: open == tokens.length ? (gap > _tokenSize ? gap : _tokenSize) : gap,
+                      height: widget.height,
+                      op: open == tokens.length ? preview : null,
+                      size: _tokenSize,
+                      color: scheme.onSurface,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -331,6 +405,7 @@ class _PlacedToken extends StatelessWidget {
     required this.index,
     required this.op,
     required this.onRemove,
+    required this.hideShadow,
   });
 
   final double size;
@@ -338,6 +413,7 @@ class _PlacedToken extends StatelessWidget {
   final int index;
   final String op;
   final ValueChanged<int> onRemove;
+  final bool hideShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -360,7 +436,9 @@ class _PlacedToken extends StatelessWidget {
       data: OpDrag.placed(op, slot, index),
       dragAnchorStrategy: pointerDragAnchorStrategy,
       feedback: _OpFeedback(op: op),
-      childWhenDragging: Opacity(opacity: 0.25, child: tile),
+      childWhenDragging: hideShadow
+          ? SizedBox(width: size, height: size * 1.15)
+          : Opacity(opacity: 0.25, child: tile),
       onDragEnd: (details) {
         if (!details.wasAccepted) onRemove(index);
       },

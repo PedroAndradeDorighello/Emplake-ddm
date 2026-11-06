@@ -89,11 +89,17 @@ class PuzzleState {
     return copyWith(selectedSlot: target).withSlot(target, tokens.join());
   }
 
+  /// Soltar aqui não muda a ordem: o sinal já ocupa esse vão.
+  static bool sameSpot(SlotId target, int index, {SlotId? from, int? fromIndex}) {
+    return from != null &&
+        fromIndex != null &&
+        from == target &&
+        (index == fromIndex || index == fromIndex + 1);
+  }
+
   /// [index] é a posição na lista antes de remover a origem.
   PuzzleState place(SlotId target, int index, String op, {SlotId? from, int? fromIndex}) {
-    if (from != null && fromIndex != null && from == target) {
-      if (index == fromIndex || index == fromIndex + 1) return this;
-    }
+    if (sameSpot(target, index, from: from, fromIndex: fromIndex)) return this;
     var next = this;
     var dest = index;
     if (from != null && fromIndex != null) {
