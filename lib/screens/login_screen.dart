@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
@@ -13,264 +12,159 @@ import '../providers/settings_provider.dart';
 const _googleWebClientId =
     '726124199747-g6glgjqjhskv6ch1ht8saec4pi0a99ip.apps.googleusercontent.com';
 
-class LoginScreen extends ConsumerStatefulWidget {
+List<AuthProvider> emplakeAuthProviders() => [
+      EmailAuthProvider(),
+      GoogleProvider(clientId: _googleWebClientId),
+    ];
+
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
-  @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _email = TextEditingController();
-  final _password = TextEditingController();
-  String? _error;
-  bool _busy = false;
-
-  @override
-  void dispose() {
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
-  }
-
-  Future<void> _emailAuth({required bool register}) async {
-    final l10n = AppLocalizations.of(context);
-    final email = _email.text.trim();
-    final password = _password.text;
-    if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = l10n.authFieldsRequired);
-      return;
-    }
-    if (register && password.length < 6) {
-      setState(() => _error = l10n.passwordTooShort);
-      return;
-    }
-
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    try {
-      final auth = ref.read(authProvider.notifier);
-      if (register) {
-        await auth.registerEmail(email, password);
-      } else {
-        await auth.signInEmail(email, password);
-      }
-    } on FirebaseAuthException catch (e) {
-      setState(() => _error = e.message ?? e.code);
-    } catch (e) {
-      setState(() => _error = e.toString());
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
+  void _goPlay(BuildContext context) {
+    if (context.mounted) context.go('/play');
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
     final firebaseReady = ref.watch(firebaseReadyProvider);
     final scheme = Theme.of(context).colorScheme;
-    final wide = MediaQuery.sizeOf(context).width >= 720;
 
-    return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              scheme.primary.withValues(alpha: 0.18),
-              scheme.surface,
-              scheme.tertiary.withValues(alpha: 0.12),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: wide ? 880 : 440),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: wide
-                    ? Row(
-                        children: [
-                          Expanded(child: _BrandPane(l10n: l10n)),
-                          const SizedBox(width: 24),
-                          Expanded(child: _form(l10n, settings, firebaseReady)),
-                        ],
-                      )
-                    : ListView(
-                        children: [
-                          _BrandPane(l10n: l10n),
-                          const SizedBox(height: 24),
-                          _form(l10n, settings, firebaseReady),
-                        ],
+    if (!firebaseReady) {
+      return Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _LanguageRow(settings: settings),
+                const SizedBox(height: 24),
+                Text(
+                  l10n.appTitle,
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: scheme.primary,
                       ),
-              ),
+                ),
+                const SizedBox(height: 8),
+                Text(l10n.loginSubtitle),
+                const SizedBox(height: 16),
+                Text(
+                  kTeamDisplay,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.firebaseMissing,
+                  style: TextStyle(color: scheme.error),
+                ),
+                const Spacer(),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    ref.read(authProvider.notifier).continueAsGuest();
+                    _goPlay(context);
+                  },
+                  icon: const Icon(Icons.person_outline),
+                  label: Text(l10n.continueAsGuest),
+                ),
+              ],
             ),
           ),
         ),
-      ),
+      );
+    }
+
+    return SignInScreen(
+      providers: emplakeAuthProviders(),
+      showAuthActionSwitch: true,
+      showPasswordVisibilityToggle: true,
+      headerMaxExtent: 220,
+      headerBuilder: (context, constraints, shrinkOffset) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _LanguageRow(settings: settings),
+              const SizedBox(height: 16),
+              Text(
+                l10n.appTitle,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: scheme.primary,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(l10n.loginSubtitle),
+              const SizedBox(height: 8),
+              Text(
+                kTeamDisplay,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+        );
+      },
+      footerBuilder: (context, action) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          child: OutlinedButton.icon(
+            onPressed: () {
+              ref.read(authProvider.notifier).continueAsGuest();
+              _goPlay(context);
+            },
+            icon: const Icon(Icons.person_outline),
+            label: Text(l10n.continueAsGuest),
+          ),
+        );
+      },
+      actions: [
+        AuthStateChangeAction<SignedIn>((context, state) => _goPlay(context)),
+        AuthStateChangeAction<UserCreated>((context, state) => _goPlay(context)),
+      ],
     );
   }
+}
 
-  Widget _form(
-    AppLocalizations l10n,
-    SettingsState settings,
-    bool firebaseReady,
-  ) {
+class _LanguageRow extends ConsumerWidget {
+  const _LanguageRow({required this.settings});
+
+  final SettingsState settings;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(l10n.language, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         Row(
           children: [
-            _FlagButton(
-              label: '🇧🇷 PT',
+            ChoiceChip(
+              label: const Text('🇧🇷 PT'),
               selected: settings.locale.languageCode == 'pt',
-              onTap: () => ref
+              onSelected: (_) => ref
                   .read(settingsProvider.notifier)
                   .setLocale(const Locale('pt')),
             ),
             const SizedBox(width: 8),
-            _FlagButton(
-              label: '🇺🇸 EN',
+            ChoiceChip(
+              label: const Text('🇺🇸 EN'),
               selected: settings.locale.languageCode == 'en',
-              onTap: () => ref
+              onSelected: (_) => ref
                   .read(settingsProvider.notifier)
                   .setLocale(const Locale('en')),
             ),
           ],
         ),
-        const SizedBox(height: 20),
-        if (!firebaseReady)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Text(
-              l10n.firebaseMissing,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        TextField(
-          controller: _email,
-          decoration: InputDecoration(
-            labelText: l10n.email,
-            border: const OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _password,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: l10n.password,
-            border: const OutlineInputBorder(),
-          ),
-        ),
-        if (_error != null) ...[
-          const SizedBox(height: 8),
-          Text(
-            _error!,
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
-        ],
-        const SizedBox(height: 16),
-        FilledButton(
-          onPressed: _busy ? null : () => _emailAuth(register: false),
-          child: Text(l10n.signIn),
-        ),
-        const SizedBox(height: 8),
-        OutlinedButton(
-          onPressed: _busy ? null : () => _emailAuth(register: true),
-          child: Text(l10n.register),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            const Expanded(child: Divider()),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(l10n.orSignInWith),
-            ),
-            const Expanded(child: Divider()),
-          ],
-        ),
-        const SizedBox(height: 16),
-        if (firebaseReady)
-          OAuthProviderButton(
-            provider: GoogleProvider(clientId: _googleWebClientId),
-          )
-        else
-          OutlinedButton.icon(
-            onPressed: null,
-            icon: const Icon(Icons.g_mobiledata),
-            label: Text(l10n.signInGoogle),
-          ),
-        const SizedBox(height: 8),
-        OutlinedButton.icon(
-          onPressed: _busy
-              ? null
-              : () {
-                  ref.read(authProvider.notifier).continueAsGuest();
-                  context.go('/play');
-                },
-          icon: const Icon(Icons.person_outline),
-          label: Text(l10n.continueAsGuest),
-        ),
       ],
-    );
-  }
-}
-
-class _BrandPane extends StatelessWidget {
-  const _BrandPane({required this.l10n});
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.appTitle,
-          style: Theme.of(context).textTheme.displaySmall
-              ?.copyWith(fontWeight: FontWeight.w900, color: scheme.primary),
-        ),
-        const SizedBox(height: 8),
-        Text(l10n.loginSubtitle),
-        const SizedBox(height: 24),
-        Text(
-          kTeamDisplay,
-          style: Theme.of(context).textTheme.titleLarge
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-      ],
-    );
-  }
-}
-
-class _FlagButton extends StatelessWidget {
-  const _FlagButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ChoiceChip(
-      label: Text(label),
-      selected: selected,
-      onSelected: (_) => onTap(),
     );
   }
 }

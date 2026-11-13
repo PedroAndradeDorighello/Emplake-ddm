@@ -36,6 +36,7 @@ class GameScreen extends ConsumerWidget {
 
     final body = Column(
       children: [
+        const SizedBox(height: 12),
         if (auth?.isGuest == true)
           Container(
             width: double.infinity,

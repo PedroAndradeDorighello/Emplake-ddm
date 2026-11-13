@@ -201,6 +201,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get soundOff => 'Off';
 
   @override
+  String get soundVolume => 'Volume';
+
+  @override
   String get helpTitle => 'How to play';
 
   @override

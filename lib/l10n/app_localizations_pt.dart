@@ -201,6 +201,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get soundOff => 'Desligado';
 
   @override
+  String get soundVolume => 'Volume';
+
+  @override
   String get helpTitle => 'Como jogar';
 
   @override

@@ -15,15 +15,24 @@ Color seedColorAt(Offset local, double value, {double size = _wheelSize}) {
   return HSVColor.fromAHSV(1, hue, dist / radius, value).toColor();
 }
 
+/// Matiz/saturação da [color]; [fullLuminosity] força a barra em 1 (temas prontos).
+HSVColor seedWheelHsv(Color color, {bool fullLuminosity = false}) {
+  final hsv = HSVColor.fromColor(color);
+  return fullLuminosity ? hsv.withValue(1) : hsv;
+}
+
 class SeedColorWheel extends StatefulWidget {
   const SeedColorWheel({
     super.key,
     required this.color,
     required this.onChanged,
     required this.onChangeEnd,
+    this.fullLuminosity = false,
   });
 
   final Color color;
+  /// Temas prontos: a barra fica no máximo; o escurecimento só vale na semente custom.
+  final bool fullLuminosity;
   final ValueChanged<Color> onChanged;
   final ValueChanged<Color> onChangeEnd;
 
@@ -34,19 +43,25 @@ class SeedColorWheel extends StatefulWidget {
 class _SeedColorWheelState extends State<SeedColorWheel> {
   late HSVColor _hsv;
   bool _dragging = false;
+  double _sliderAnchor = 1;
   ScrollHoldController? _releaseScroll;
+
+  HSVColor get _synced =>
+      seedWheelHsv(widget.color, fullLuminosity: widget.fullLuminosity);
 
   @override
   void initState() {
     super.initState();
-    _hsv = HSVColor.fromColor(widget.color);
+    _hsv = _synced;
   }
 
   @override
   void didUpdateWidget(SeedColorWheel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_dragging && widget.color != oldWidget.color) {
-      _hsv = HSVColor.fromColor(widget.color);
+    if (_dragging) return;
+    if (widget.color != oldWidget.color ||
+        widget.fullLuminosity != oldWidget.fullLuminosity) {
+      _hsv = _synced;
     }
   }
 
@@ -70,6 +85,8 @@ class _SeedColorWheelState extends State<SeedColorWheel> {
     _dropScroll();
     widget.onChangeEnd(_hsv.toColor());
   }
+
+  bool _movedSlider(double v) => (v - _sliderAnchor).abs() >= 0.002;
 
   @override
   Widget build(BuildContext context) {
@@ -101,16 +118,19 @@ class _SeedColorWheelState extends State<SeedColorWheel> {
             Expanded(
               child: Slider(
                 value: _hsv.value,
-                onChanged: (v) {
+                onChangeStart: (v) {
                   _dragging = true;
+                  _sliderAnchor = _hsv.value;
+                },
+                onChanged: (v) {
                   setState(() => _hsv = _hsv.withValue(v));
-                  widget.onChanged(_hsv.toColor());
+                  if (_movedSlider(v)) widget.onChanged(_hsv.toColor());
                 },
                 onChangeEnd: (v) {
                   final next = _hsv.withValue(v);
                   _dragging = false;
                   setState(() => _hsv = next);
-                  widget.onChangeEnd(next.toColor());
+                  if (_movedSlider(v)) widget.onChangeEnd(next.toColor());
                 },
               ),
             ),

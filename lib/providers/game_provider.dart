@@ -8,7 +8,6 @@ import '../services/progress_repository.dart';
 import '../services/puzzle_generator.dart';
 import '../services/sound_service.dart';
 import 'auth_provider.dart';
-import 'settings_provider.dart';
 
 enum VerifyFeedback { none, correct, incorrect, invalid, missingEquals, nonIntegerDivision }
 
@@ -107,6 +106,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
       puzzle: state.puzzle.stamp(op),
       feedback: VerifyFeedback.none,
     );
+    _sound.playPlace();
   }
 
   void drop(SlotId target, OpDrag drag, int index) {
@@ -119,6 +119,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
     );
     if (identical(next, state.puzzle)) return;
     state = state.copyWith(puzzle: next, feedback: VerifyFeedback.none);
+    _sound.playPlace();
   }
 
   void removePlaced(SlotId slot, int index) {
@@ -144,7 +145,6 @@ class GameNotifier extends StateNotifier<GameViewState> {
   }
 
   Future<void> verify() async {
-    _sound.enabled = _ref.read(settingsProvider).soundEnabled;
     final result = evaluateExpression(
       state.puzzle.displayExpression,
       state.puzzle.difficulty,
@@ -220,12 +220,6 @@ class GameNotifier extends StateNotifier<GameViewState> {
         Difficulty.hard => 5,
       };
 }
-
-final soundServiceProvider = Provider<SoundService>((ref) {
-  final s = SoundService();
-  ref.onDispose(s.dispose);
-  return s;
-});
 
 final gameProvider = StateNotifierProvider<GameNotifier, GameViewState>((ref) {
   return GameNotifier(

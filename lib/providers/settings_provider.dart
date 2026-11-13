@@ -17,7 +17,8 @@ class SettingsState {
     this.seedColor = const Color(0xFF0D7377),
     this.preset = ThemePreset.systemSeed,
     this.schemeVariant = DynamicSchemeVariant.tonalSpot,
-    this.soundEnabled = false,
+    this.soundMuted = true,
+    this.soundVolume = 0,
     this.locale = const Locale('pt'),
   });
 
@@ -27,8 +28,17 @@ class SettingsState {
   final Color seedColor;
   final ThemePreset preset;
   final DynamicSchemeVariant schemeVariant;
-  final bool soundEnabled;
+  final bool soundMuted;
+  final double soundVolume;
   final Locale locale;
+
+  bool get soundActive => !soundMuted && soundVolume > 0.001;
+
+  IconData get soundIcon {
+    if (soundMuted || soundVolume <= 0.001) return Icons.volume_off;
+    if (soundVolume < 0.45) return Icons.volume_down;
+    return Icons.volume_up;
+  }
 
   Color get effectiveSeed => switch (preset) {
         ThemePreset.ocean => const Color(0xFF0D7377),
@@ -46,7 +56,8 @@ class SettingsState {
     Color? seedColor,
     ThemePreset? preset,
     DynamicSchemeVariant? schemeVariant,
-    bool? soundEnabled,
+    bool? soundMuted,
+    double? soundVolume,
     Locale? locale,
   }) {
     return SettingsState(
@@ -56,7 +67,8 @@ class SettingsState {
       seedColor: seedColor ?? this.seedColor,
       preset: preset ?? this.preset,
       schemeVariant: schemeVariant ?? this.schemeVariant,
-      soundEnabled: soundEnabled ?? this.soundEnabled,
+      soundMuted: soundMuted ?? this.soundMuted,
+      soundVolume: soundVolume ?? this.soundVolume,
       locale: locale ?? this.locale,
     );
   }
@@ -71,6 +83,8 @@ Map<String, dynamic> profileFields(SettingsState s, {String? lastRoute}) => {
       'preset': s.preset.name,
       'scheme': s.schemeVariant.name,
       'locale': s.locale.languageCode,
+      'soundVolume': s.soundVolume,
+      'soundMuted': s.soundMuted,
       'lastRoute': ?lastRoute,
     };
 
@@ -91,6 +105,8 @@ SettingsState applyProfile(SettingsState base, Map<String, dynamic> map) {
     seedColor: map['seedColor'] is num ? Color((map['seedColor'] as num).toInt()) : null,
     preset: _enumByName(ThemePreset.values, map['preset']),
     schemeVariant: _enumByName(DynamicSchemeVariant.values, map['scheme']),
+    soundVolume: (map['soundVolume'] as num?)?.toDouble(),
+    soundMuted: map['soundMuted'] as bool?,
     locale: lang is String && lang.isNotEmpty ? Locale(lang) : null,
   );
 }
@@ -117,8 +133,8 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     final preset = ThemePreset.values[_prefs.getInt('preset') ?? 0];
     final scheme = _enumByName(DynamicSchemeVariant.values, _prefs.getString('scheme')) ??
         DynamicSchemeVariant.tonalSpot;
-    final sound = _prefs.getBool('sound') ?? false;
     final lang = _prefs.getString('locale') ?? 'pt';
+    // Som não volta do SharedPreferences: só do Firebase após login.
     state = SettingsState(
       themeMode: mode,
       fontSize: fontSize,
@@ -126,7 +142,8 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       seedColor: seed,
       preset: preset,
       schemeVariant: scheme,
-      soundEnabled: sound,
+      soundMuted: true,
+      soundVolume: 0,
       locale: Locale(lang),
     );
   }
@@ -138,7 +155,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     await _prefs.setInt('seedColor', state.seedColor.toARGB32());
     await _prefs.setInt('preset', state.preset.index);
     await _prefs.setString('scheme', state.schemeVariant.name);
-    await _prefs.setBool('sound', state.soundEnabled);
     await _prefs.setString('locale', state.locale.languageCode);
   }
 
@@ -152,11 +168,29 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         );
   }
 
+  /// Mudo local (convidado / saída). Não sobe ao Firebase.
+  Future<void> resetSoundToMute() async {
+    if (state.soundMuted && state.soundVolume <= 0.001) return;
+    state = state.copyWith(soundMuted: true, soundVolume: 0);
+    await _writeLocal();
+  }
+
   /// Aplica o perfil da nuvem. Devolve a última tela, se houver.
   Future<String?> pullProfile(String uid) async {
     final map = await _ref.read(progressRepositoryProvider).readProfile(uid);
-    if (map == null) return null;
-    state = applyProfile(state, map);
+    if (map == null) {
+      await resetSoundToMute();
+      return null;
+    }
+    // Sem campos de som no perfil → permanece mudo.
+    final hasSound = map.containsKey('soundVolume') || map.containsKey('soundMuted');
+    var next = applyProfile(state, map);
+    if (!hasSound) {
+      next = next.copyWith(soundMuted: true, soundVolume: 0);
+    } else if (!map.containsKey('soundMuted')) {
+      next = next.copyWith(soundMuted: next.soundVolume <= 0.001);
+    }
+    state = next;
     await _writeLocal();
     final route = profileLastRoute(map);
     if (route != null) await _prefs.setString('last_route', route);
@@ -193,8 +227,24 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     _persist();
   }
 
-  void setSound(bool on) {
-    state = state.copyWith(soundEnabled: on);
+  void toggleSoundMute() {
+    if (state.soundMuted || state.soundVolume <= 0.001) {
+      state = state.copyWith(
+        soundMuted: false,
+        soundVolume: state.soundVolume <= 0.001 ? 0.6 : state.soundVolume,
+      );
+    } else {
+      state = state.copyWith(soundMuted: true);
+    }
+    _persist();
+  }
+
+  void setSoundVolume(double v) {
+    final volume = v.clamp(0.0, 1.0);
+    state = state.copyWith(
+      soundVolume: volume,
+      soundMuted: volume <= 0.001,
+    );
     _persist();
   }
 

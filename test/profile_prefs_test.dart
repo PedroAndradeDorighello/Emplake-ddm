@@ -31,4 +31,11 @@ void main() {
     expect(restored.schemeVariant, DynamicSchemeVariant.rainbow);
     expect(profileLastRoute(const {'score': 3}), isNull);
   });
+
+  test('default settings start muted', () {
+    const s = SettingsState();
+    expect(s.soundActive, isFalse);
+    expect(s.soundVolume, 0);
+    expect(s.soundMuted, isTrue);
+  });
 }

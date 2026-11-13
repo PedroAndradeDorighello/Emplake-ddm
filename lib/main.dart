@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_localizations/firebase_ui_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +11,9 @@ import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/settings_provider.dart';
 import 'router/app_router.dart';
+import 'screens/login_screen.dart';
 import 'services/progress_repository.dart';
+import 'services/sound_service.dart';
 import 'theme/app_theme.dart';
 import 'theme/screen_scale.dart';
 
@@ -21,6 +24,7 @@ Future<void> main() async {
   var firebaseReady = false;
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    FirebaseUIAuth.configureProviders(emplakeAuthProviders());
     firebaseReady = true;
   } catch (_) {
     firebaseReady = false;
@@ -51,13 +55,36 @@ class EmplakeApp extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final router = ref.watch(routerProvider);
     ref.listen(authProvider, (previous, next) {
-      if (next == null || next.isGuest || previous?.uid == next.uid) return;
+      if (next == null || next.isGuest) {
+        ref.read(settingsProvider.notifier).resetSoundToMute();
+        return;
+      }
+      if (previous?.uid == next.uid) return;
       final uid = next.uid;
       Future<void>(() async {
         final route = await ref.read(settingsProvider.notifier).pullProfile(uid);
         if (route != null) ref.read(routerProvider).go(route);
       });
     });
+    void syncSound(SettingsState s) {
+      ref.read(soundServiceProvider).apply(
+            enabled: s.soundActive,
+            volume: s.soundVolume,
+          );
+    }
+
+    ref.listen(settingsProvider, (previous, next) {
+      if (previous?.soundMuted == next.soundMuted &&
+          previous?.soundVolume == next.soundVolume) {
+        return;
+      }
+      syncSound(next);
+    });
+    final sound = ref.read(soundServiceProvider);
+    if (sound.enabled != settings.soundActive ||
+        sound.volume != settings.soundVolume) {
+      Future.microtask(() => syncSound(settings));
+    }
 
     return MaterialApp.router(
       title: 'Emplake',

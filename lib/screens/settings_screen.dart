@@ -49,20 +49,21 @@ class SettingsScreen extends ConsumerWidget {
             onSelectionChanged: (v) => n.setThemeMode(v.first),
           ),
           const SizedBox(height: 16),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(s.soundEnabled ? Icons.volume_up : Icons.volume_off),
-                const SizedBox(width: 8),
-                Text(l10n.sound),
-                Switch(
-                  value: s.soundEnabled,
-                  onChanged: n.setSound,
+          Text(l10n.sound, style: Theme.of(context).textTheme.titleMedium),
+          Row(
+            children: [
+              IconButton(
+                tooltip: s.soundActive ? l10n.soundOff : l10n.soundOn,
+                onPressed: n.toggleSoundMute,
+                icon: Icon(s.soundIcon),
+              ),
+              Expanded(
+                child: Slider(
+                  value: s.soundMuted ? 0 : s.soundVolume.clamp(0.0, 1.0),
+                  onChanged: n.setSoundVolume,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           Text('${l10n.fontSize}: ${s.fontSize.toStringAsFixed(0)}'),
@@ -141,6 +142,7 @@ class SettingsScreen extends ConsumerWidget {
               Center(
                 child: SeedColorWheel(
                   color: s.effectiveSeed,
+                  fullLuminosity: s.preset != ThemePreset.custom,
                   onChanged: (c) => n.setSeedColor(c, persist: false),
                   onChangeEnd: n.setSeedColor,
                 ),

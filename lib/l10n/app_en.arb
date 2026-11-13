@@ -63,6 +63,7 @@
   "sound": "Sound",
   "soundOn": "On",
   "soundOff": "Off",
+  "soundVolume": "Volume",
   "helpTitle": "How to play",
   "helpBody": "You get four digits in this order. Drag signs into the gaps before the first digit, between them, and after the last one, until both sides of = are equal.\n\n• The expression starts empty. = is not placed in the middle: put it where the equality makes sense.\n• An empty gap joins digits. 3 and 4 side by side make 34.\n• To remove a sign, drag it off the expression.\n• Easy adds square root, cube root, factorial, power, absolute value, floor, and ceiling. Only this level allows a non-integer division.\n• Intermediate drops floor and ceiling. Advanced keeps square root, factorial, and absolute value. Hard keeps +, −, ×, ÷, parentheses, and absolute value.\n• Skip replaces the number. Solved ones do not appear again.",
   "operatorsForLevel": "Operators for this level",

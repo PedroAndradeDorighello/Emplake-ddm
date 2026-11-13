@@ -63,6 +63,7 @@
   "sound": "Som",
   "soundOn": "Ligado",
   "soundOff": "Desligado",
+  "soundVolume": "Volume",
   "helpTitle": "Como jogar",
   "helpBody": "Você recebe quatro dígitos nesta ordem. Arraste sinais para os espaços antes do primeiro, entre eles e depois do último, até os dois lados do = ficarem iguais.\n\n• A expressão começa sem sinais. O = não vem no meio: coloque-o onde a igualdade fizer sentido.\n• Um espaço vazio junta os dígitos. 3 e 4 lado a lado formam 34.\n• Para remover um sinal, arraste-o para fora da expressão.\n• Fácil traz raiz quadrada, raiz cúbica, fatorial, potência, módulo, chão e teto. Só nesse nível a divisão pode não ser inteira.\n• Intermediário tira chão e teto. Avançado fica com raiz quadrada, fatorial e módulo. Difícil fica com +, −, ×, ÷, parênteses e módulo.\n• Pular troca o número. Os que você já resolveu não aparecem de novo.",
   "operatorsForLevel": "Operadores deste nível",

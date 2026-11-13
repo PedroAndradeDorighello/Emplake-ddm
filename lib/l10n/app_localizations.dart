@@ -476,6 +476,12 @@ abstract class AppLocalizations {
   /// **'Off'**
   String get soundOff;
 
+  /// No description provided for @soundVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get soundVolume;
+
   /// No description provided for @helpTitle.
   ///
   /// In en, this message translates to:
