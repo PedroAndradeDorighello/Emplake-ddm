@@ -64,12 +64,14 @@ class GameNotifier extends StateNotifier<GameViewState> {
 
   Future<void> _bootstrap() async {
     final progress = await _repo.load(_uid);
+    const d = Difficulty.easy;
     final n = nextPuzzleNumber(
       solved: progress.solved,
       skipped: progress.skipped,
+      difficulty: d,
     );
     state = GameViewState(
-      puzzle: PuzzleState(digits: digitsOf(n), difficulty: Difficulty.easy),
+      puzzle: PuzzleState(digits: digitsOf(n), difficulty: d),
       progress: progress,
     );
   }
@@ -81,6 +83,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
     final n = nextPuzzleNumber(
       solved: progress.solved,
       skipped: progress.skipped,
+      difficulty: d,
     );
     state = GameViewState(
       puzzle: PuzzleState(
@@ -92,11 +95,14 @@ class GameNotifier extends StateNotifier<GameViewState> {
   }
 
   void setDifficulty(Difficulty d) {
+    if (d == state.puzzle.difficulty) return;
+    final n = nextPuzzleNumber(
+      solved: state.progress.solved,
+      skipped: state.progress.skipped,
+      difficulty: d,
+    );
     state = state.copyWith(
-      puzzle: PuzzleState(
-        digits: state.puzzle.digits,
-        difficulty: d,
-      ),
+      puzzle: PuzzleState(digits: digitsOf(n), difficulty: d),
       feedback: VerifyFeedback.none,
     );
   }
@@ -181,6 +187,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
       final next = nextPuzzleNumber(
         solved: nextProgress.solved,
         skipped: nextProgress.skipped,
+        difficulty: d,
       );
       state = GameViewState(
         puzzle: PuzzleState(
@@ -211,6 +218,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
     final next = nextPuzzleNumber(
       solved: nextProgress.solved,
       skipped: nextProgress.skipped,
+      difficulty: d,
     );
     state = GameViewState(
       puzzle: PuzzleState(
