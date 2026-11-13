@@ -1,6 +1,9 @@
 import 'dart:math';
 
+import 'hard_solvable_numbers.dart';
+
 /// Gera número de 4 dígitos ainda não resolvido/pulado.
+/// Em todos os níveis, só sorteia números com solução no conjunto do Difícil.
 int nextPuzzleNumber({
   required Set<int> solved,
   required Set<int> skipped,
@@ -8,15 +11,19 @@ int nextPuzzleNumber({
 }) {
   final rng = random ?? Random();
   final blocked = {...solved, ...skipped};
-  // ponytail: O(tentativas) — espaço 9000; se esgotar, reutiliza skipped
-  for (var attempt = 0; attempt < 5000; attempt++) {
+  bool allowed(int n) => isHardSolvable(n) && !blocked.contains(n);
+
+  // ponytail: O(tentativas); espaço útil ~4377
+  for (var attempt = 0; attempt < 8000; attempt++) {
     final n = 1000 + rng.nextInt(9000);
-    if (!blocked.contains(n)) return n;
+    if (allowed(n)) return n;
   }
-  for (var n = 1000; n <= 9999; n++) {
+  for (final n in hardSolvableNumbers) {
     if (!solved.contains(n)) return n;
   }
-  return 1000 + rng.nextInt(9000);
+  final pool = hardSolvableNumbers.difference(solved).toList();
+  if (pool.isNotEmpty) return pool[rng.nextInt(pool.length)];
+  return hardSolvableNumbers.first;
 }
 
 List<int> digitsOf(int n) {

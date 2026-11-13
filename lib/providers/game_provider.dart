@@ -64,7 +64,10 @@ class GameNotifier extends StateNotifier<GameViewState> {
 
   Future<void> _bootstrap() async {
     final progress = await _repo.load(_uid);
-    final n = nextPuzzleNumber(solved: progress.solved, skipped: progress.skipped);
+    final n = nextPuzzleNumber(
+      solved: progress.solved,
+      skipped: progress.skipped,
+    );
     state = GameViewState(
       puzzle: PuzzleState(digits: digitsOf(n), difficulty: Difficulty.easy),
       progress: progress,
@@ -74,11 +77,15 @@ class GameNotifier extends StateNotifier<GameViewState> {
   Future<void> reloadProgress() async {
     state = state.copyWith(loading: true);
     final progress = await _repo.load(_uid);
-    final n = nextPuzzleNumber(solved: progress.solved, skipped: progress.skipped);
+    final d = state.puzzle.difficulty;
+    final n = nextPuzzleNumber(
+      solved: progress.solved,
+      skipped: progress.skipped,
+    );
     state = GameViewState(
       puzzle: PuzzleState(
         digits: digitsOf(n),
-        difficulty: state.puzzle.difficulty,
+        difficulty: d,
       ),
       progress: progress,
     );
@@ -170,6 +177,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
         solved: {...state.progress.solved, num},
       );
       await _repo.save(_uid, nextProgress);
+      final d = state.puzzle.difficulty;
       final next = nextPuzzleNumber(
         solved: nextProgress.solved,
         skipped: nextProgress.skipped,
@@ -177,7 +185,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
       state = GameViewState(
         puzzle: PuzzleState(
           digits: digitsOf(next),
-          difficulty: state.puzzle.difficulty,
+          difficulty: d,
         ),
         progress: nextProgress,
         feedback: VerifyFeedback.correct,
@@ -199,6 +207,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
       skipped: {...state.progress.skipped, num},
     );
     await _repo.save(_uid, nextProgress);
+    final d = state.puzzle.difficulty;
     final next = nextPuzzleNumber(
       solved: nextProgress.solved,
       skipped: nextProgress.skipped,
@@ -206,7 +215,7 @@ class GameNotifier extends StateNotifier<GameViewState> {
     state = GameViewState(
       puzzle: PuzzleState(
         digits: digitsOf(next),
-        difficulty: state.puzzle.difficulty,
+        difficulty: d,
       ),
       progress: nextProgress,
       resetAnim: state.resetAnim + 1,
