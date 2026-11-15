@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +185,7 @@ class _AuthPane extends ConsumerWidget {
             ],
             child: LoginView(
               action: AuthAction.signIn,
-              providers: emplakeAuthProviders(),
+              providers: FirebaseUIAuth.providersFor(Firebase.app()),
               showTitle: false,
               showAuthActionSwitch: true,
               showPasswordVisibilityToggle: true,

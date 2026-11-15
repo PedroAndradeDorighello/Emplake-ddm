@@ -27,7 +27,9 @@ ColorScheme applySeedLuminosity(ColorScheme scheme, double value) {
 
 ThemeData buildTheme(SettingsState s, Brightness brightness) {
   final hsv = HSVColor.fromColor(s.effectiveSeed);
-  final vivid = s.preset == ThemePreset.custom ? hsv.withValue(1).toColor() : s.effectiveSeed;
+  final vivid = s.preset == ThemePreset.custom
+      ? hsv.withValue(1).toColor()
+      : s.effectiveSeed;
   var scheme = ColorScheme.fromSeed(
     seedColor: vivid,
     brightness: brightness,

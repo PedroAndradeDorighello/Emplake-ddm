@@ -18,7 +18,8 @@ dependencies:
   intl: any
   curved_navigation_bar: ^1.0.6
   flutter_math_fork: ^0.7.3
-  google_fonts: ^6.2.1
+  # ponytail: 9.x exige material_ui; firebase_ui_auth ainda usa flutter/material
+  google_fonts: ^8.0.0
   loading_animation_widget: ^1.3.0
   audioplayers: ^6.4.0
   firebase_core: ^3.13.0
