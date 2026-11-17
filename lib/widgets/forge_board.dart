@@ -366,10 +366,18 @@ class _InsertGap extends StatelessWidget {
     return SizedBox(
       width: width,
       height: height,
-      child: op == null
-          ? null
-          : Center(
-              child: Opacity(
+      child: Center(
+        child: op == null
+            // Guia discreto: dá para inserir entre tokens (não é um "+").
+            ? Container(
+                width: 2,
+                height: height * 0.4,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              )
+            : Opacity(
                 opacity: 0.45,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
@@ -393,7 +401,7 @@ class _InsertGap extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
+      ),
     );
   }
 }

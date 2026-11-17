@@ -170,20 +170,28 @@ class GameNotifier extends StateNotifier<GameViewState> {
         _ => VerifyFeedback.invalid,
       };
       await _sound.playFail();
-      state = state.copyWith(feedback: fb, resetAnim: state.resetAnim + 1);
-      state = state.copyWith(puzzle: state.puzzle.clearOperators());
+      // Professor: não limpar operadores no erro — o usuário continua de onde parou.
+      state = state.copyWith(feedback: fb);
       return;
     }
 
     if (result.equal) {
       await _sound.playSuccess();
-      final num = state.puzzle.number;
+      final solvedNum = state.puzzle.number;
+      final d = state.puzzle.difficulty;
       final nextProgress = state.progress.copyWith(
-        score: state.progress.score + _pointsFor(state.puzzle.difficulty),
-        solved: {...state.progress.solved, num},
+        score: state.progress.score + _pointsFor(d),
+        solved: {...state.progress.solved, solvedNum},
       );
       await _repo.save(_uid, nextProgress);
-      final d = state.puzzle.difficulty;
+      state = state.copyWith(
+        progress: nextProgress,
+        feedback: VerifyFeedback.correct,
+      );
+      // Deixa o acerto visível antes de trocar o número.
+      await Future<void>.delayed(const Duration(milliseconds: 2000));
+      if (state.feedback != VerifyFeedback.correct) return;
+      if (state.puzzle.number != solvedNum) return;
       final next = nextPuzzleNumber(
         solved: nextProgress.solved,
         skipped: nextProgress.skipped,
@@ -195,16 +203,11 @@ class GameNotifier extends StateNotifier<GameViewState> {
           difficulty: d,
         ),
         progress: nextProgress,
-        feedback: VerifyFeedback.correct,
         resetAnim: state.resetAnim + 1,
       );
     } else {
       await _sound.playFail();
-      state = state.copyWith(
-        feedback: VerifyFeedback.incorrect,
-        resetAnim: state.resetAnim + 1,
-        puzzle: state.puzzle.clearOperators(),
-      );
+      state = state.copyWith(feedback: VerifyFeedback.incorrect);
     }
   }
 
