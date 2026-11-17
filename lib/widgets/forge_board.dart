@@ -367,17 +367,9 @@ class _InsertGap extends StatelessWidget {
       width: width,
       height: height,
       child: Center(
-        child: op == null
-            // Guia discreto: dá para inserir entre tokens (não é um "+").
-            ? Container(
-                width: 2,
-                height: height * 0.4,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(1),
-                ),
-              )
-            : Opacity(
+        child: op != null
+            // Fantasma do sinal sendo arrastado — cobre o guia neste vão.
+            ? Opacity(
                 opacity: 0.45,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
@@ -399,6 +391,14 @@ class _InsertGap extends StatelessWidget {
                       ),
                     ),
                   ),
+                ),
+              )
+            : Container(
+                width: 2,
+                height: height * 0.4,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(1),
                 ),
               ),
       ),

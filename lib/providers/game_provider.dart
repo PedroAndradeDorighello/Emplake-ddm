@@ -169,46 +169,53 @@ class GameNotifier extends StateNotifier<GameViewState> {
         'nonIntegerDivision' => VerifyFeedback.nonIntegerDivision,
         _ => VerifyFeedback.invalid,
       };
-      await _sound.playFail();
-      // Professor: não limpar operadores no erro — o usuário continua de onde parou.
+      // Feedback na hora; som não bloqueia a UI.
       state = state.copyWith(feedback: fb);
+      _sound.playFail();
       return;
     }
 
     if (result.equal) {
-      await _sound.playSuccess();
       final solvedNum = state.puzzle.number;
       final d = state.puzzle.difficulty;
+      final expr = state.puzzle.displayExpression;
       final nextProgress = state.progress.copyWith(
         score: state.progress.score + _pointsFor(d),
-        solved: {...state.progress.solved, solvedNum},
+        solved: state.progress.withSolved(solvedNum),
+        solutions: {
+          ...state.progress.solutions,
+          solvedNum: SavedSolution(expression: expr, difficulty: d),
+        },
       );
-      await _repo.save(_uid, nextProgress);
       state = state.copyWith(
         progress: nextProgress,
         feedback: VerifyFeedback.correct,
       );
-      // Deixa o acerto visível antes de trocar o número.
-      await Future<void>.delayed(const Duration(milliseconds: 2000));
-      if (state.feedback != VerifyFeedback.correct) return;
-      if (state.puzzle.number != solvedNum) return;
-      final next = nextPuzzleNumber(
-        solved: nextProgress.solved,
-        skipped: nextProgress.skipped,
-        difficulty: d,
-      );
-      state = GameViewState(
-        puzzle: PuzzleState(
-          digits: digitsOf(next),
-          difficulty: d,
-        ),
-        progress: nextProgress,
-        resetAnim: state.resetAnim + 1,
-      );
+      _sound.playSuccess();
+      // ignore: unawaited_futures
+      _repo.save(_uid, nextProgress);
     } else {
-      await _sound.playFail();
       state = state.copyWith(feedback: VerifyFeedback.incorrect);
+      _sound.playFail();
     }
+  }
+
+  void advance() {
+    if (state.feedback != VerifyFeedback.correct) return;
+    final d = state.puzzle.difficulty;
+    final next = nextPuzzleNumber(
+      solved: state.progress.solved,
+      skipped: state.progress.skipped,
+      difficulty: d,
+    );
+    state = GameViewState(
+      puzzle: PuzzleState(
+        digits: digitsOf(next),
+        difficulty: d,
+      ),
+      progress: state.progress,
+      resetAnim: state.resetAnim + 1,
+    );
   }
 
   Future<void> skip() async {

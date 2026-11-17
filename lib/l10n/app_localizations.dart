@@ -263,8 +263,20 @@ abstract class AppLocalizations {
   /// No description provided for @nextPuzzle.
   ///
   /// In en, this message translates to:
-  /// **'Next'**
+  /// **'Advance'**
   String get nextPuzzle;
+
+  /// No description provided for @showSolutionSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Show steps'**
+  String get showSolutionSteps;
+
+  /// No description provided for @hideSolutionSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide steps'**
+  String get hideSolutionSteps;
 
   /// No description provided for @correct.
   ///
@@ -308,6 +320,18 @@ abstract class AppLocalizations {
   /// **'LaTeX preview'**
   String get latexPreview;
 
+  /// No description provided for @copyLatex.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy LaTeX'**
+  String get copyLatex;
+
+  /// No description provided for @latexCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'LaTeX copied'**
+  String get latexCopied;
+
   /// No description provided for @score.
   ///
   /// In en, this message translates to:
@@ -331,6 +355,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No puzzles solved yet.'**
   String get noSolvedYet;
+
+  /// No description provided for @yourSolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Your solution'**
+  String get yourSolution;
+
+  /// No description provided for @noSolutionSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'No solution saved for this number.'**
+  String get noSolutionSaved;
+
+  /// No description provided for @tapSolvedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a solved number to see your solution.'**
+  String get tapSolvedHint;
 
   /// No description provided for @loadingProgress.
   ///

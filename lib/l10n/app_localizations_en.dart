@@ -91,7 +91,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clear => 'Clear';
 
   @override
-  String get nextPuzzle => 'Next';
+  String get nextPuzzle => 'Advance';
+
+  @override
+  String get showSolutionSteps => 'Show steps';
+
+  @override
+  String get hideSolutionSteps => 'Hide steps';
 
   @override
   String get correct => 'Correct! Equation is true.';
@@ -117,6 +123,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get latexPreview => 'LaTeX preview';
 
   @override
+  String get copyLatex => 'Copy LaTeX';
+
+  @override
+  String get latexCopied => 'LaTeX copied';
+
+  @override
   String get score => 'Score';
 
   @override
@@ -127,6 +139,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noSolvedYet => 'No puzzles solved yet.';
+
+  @override
+  String get yourSolution => 'Your solution';
+
+  @override
+  String get noSolutionSaved => 'No solution saved for this number.';
+
+  @override
+  String get tapSolvedHint => 'Tap a solved number to see your solution.';
 
   @override
   String get loadingProgress => 'Loading your progress…';

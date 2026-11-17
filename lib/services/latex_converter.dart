@@ -7,6 +7,8 @@ String expressionToLatex(String expr) {
   s = _wrapUnary(s, '∛', r'\sqrt[3]');
   s = s.replaceAll('×', r'\times ');
   s = s.replaceAll('÷', r'\div ');
+  // `*` solto (ex.: 3***2) não é LaTeX válido.
+  s = s.replaceAll('*', r'\times ');
   s = s.replaceAll('⌊', r'\lfloor ');
   s = s.replaceAll('⌋', r'\rfloor ');
   s = s.replaceAll('⌈', r'\lceil ');
@@ -59,7 +61,8 @@ String _bracePowers(String input) {
         i += m.group(0)!.length;
         continue;
       }
-      out.write('}');
+      // Expoente ainda vazio (ex.: `3**` ou `3***2`) — placeholder válido.
+      out.write(r'\square}');
       continue;
     }
     out.write(input[i]);
@@ -68,16 +71,27 @@ String _bracePowers(String input) {
   return out.toString();
 }
 
+/// Pares `|…|` → `\left\lvert … \right\rvert`; `|` solto → `\lvert`.
 String _wrapAbs(String input) {
   final out = StringBuffer();
-  var open = true;
-  for (var i = 0; i < input.length; i++) {
-    if (input[i] == '|') {
-      out.write(open ? r'\left\lvert ' : r'\right\rvert ');
-      open = !open;
-    } else {
+  var i = 0;
+  while (i < input.length) {
+    if (input[i] != '|') {
       out.write(input[i]);
+      i++;
+      continue;
     }
+    final close = input.indexOf('|', i + 1);
+    if (close < 0) {
+      out.write(r'\lvert ');
+      i++;
+      continue;
+    }
+    out
+      ..write(r'\left\lvert ')
+      ..write(input.substring(i + 1, close))
+      ..write(r' \right\rvert ');
+    i = close + 1;
   }
   return out.toString();
 }
@@ -101,6 +115,8 @@ String _wrapUnary(String input, String symbol, String latexCmd) {
       if (m != null) {
         out.write('{${m.group(0)}}');
         i += m.group(0)!.length;
+      } else {
+        out.write(r'{\square}');
       }
       continue;
     }

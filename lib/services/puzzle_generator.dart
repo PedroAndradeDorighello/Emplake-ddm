@@ -5,8 +5,8 @@ import 'solvable_by_difficulty.dart';
 
 /// Gera número de 4 dígitos ainda não resolvido/pulado, solúvel no nível.
 int nextPuzzleNumber({
-  required Set<int> solved,
-  required Set<int> skipped,
+  required Iterable<int> solved,
+  required Iterable<int> skipped,
   required Difficulty difficulty,
   Random? random,
 }) {
@@ -22,7 +22,7 @@ int nextPuzzleNumber({
   }
   final available = pool.difference(blocked).toList();
   if (available.isNotEmpty) return available[rng.nextInt(available.length)];
-  final unsolved = pool.difference(solved).toList();
+  final unsolved = pool.difference({...solved}).toList();
   if (unsolved.isNotEmpty) return unsolved[rng.nextInt(unsolved.length)];
   return pool.first;
 }

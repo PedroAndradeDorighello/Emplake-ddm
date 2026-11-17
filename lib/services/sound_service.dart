@@ -22,18 +22,25 @@ class SoundService {
     } catch (_) {}
   }
 
-  Future<void> playSuccess() => _playSfx(_risingSuccess());
+  Uint8List? _successWav;
+  Uint8List? _failWav;
+  Uint8List? _placeWav;
 
-  Future<void> playFail() => _playSfx(_tone(freq: 196, ms: 220, gain: 0.65));
+  Future<void> playSuccess() => _playSfx(_successWav ??= _risingSuccess());
 
-  Future<void> playPlace() => _playSfx(_tone(freq: 360, ms: 70, gain: 0.75));
+  Future<void> playFail() =>
+      _playSfx(_failWav ??= _tone(freq: 196, ms: 220, gain: 0.65));
+
+  Future<void> playPlace() =>
+      _playSfx(_placeWav ??= _tone(freq: 360, ms: 70, gain: 0.75));
 
   Future<void> _playSfx(Uint8List wav) async {
     if (!enabled || volume <= 0.001) return;
     try {
       await _sfx.setVolume(volume);
       await _sfx.stop();
-      await _sfx.play(BytesSource(wav, mimeType: 'audio/wav'));
+      // Não espera o áudio terminar — só dispara.
+      _sfx.play(BytesSource(wav, mimeType: 'audio/wav'));
     } catch (_) {}
   }
 

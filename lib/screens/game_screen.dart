@@ -95,7 +95,11 @@ class GameScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 8),
-        LatexPreview(expression: game.puzzle.displayExpression),
+        LatexPreview(
+          expression: game.puzzle.displayExpression,
+          difficulty: game.puzzle.difficulty,
+          canShowSteps: game.feedback == VerifyFeedback.correct,
+        ),
         if (game.feedback != VerifyFeedback.none)
           Padding(
             padding: const EdgeInsets.all(12),
@@ -121,7 +125,9 @@ class GameScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: OperatorStamps(
               operators: game.puzzle.difficulty.operators,
-              onStamp: ref.read(gameProvider.notifier).stamp,
+              onStamp: game.feedback == VerifyFeedback.correct
+                  ? (_) {}
+                  : ref.read(gameProvider.notifier).stamp,
             ),
           ),
         ),
@@ -129,31 +135,48 @@ class GameScreen extends ConsumerWidget {
           top: false,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => ref.read(gameProvider.notifier).clearOps(),
-                    child: Text(l10n.clear),
+            child: game.feedback == VerifyFeedback.correct
+                ? SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: scheme.tertiary,
+                        foregroundColor: scheme.onTertiary,
+                      ),
+                      onPressed: () =>
+                          ref.read(gameProvider.notifier).advance(),
+                      icon: const Icon(Icons.arrow_forward),
+                      label: Text(l10n.nextPuzzle),
+                    ),
+                  )
+                : Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () =>
+                              ref.read(gameProvider.notifier).clearOps(),
+                          child: Text(l10n.clear),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () =>
+                              ref.read(gameProvider.notifier).skip(),
+                          child: Text(l10n.skip),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        flex: 2,
+                        child: FilledButton(
+                          onPressed: () =>
+                              ref.read(gameProvider.notifier).verify(),
+                          child: Text(l10n.verify),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => ref.read(gameProvider.notifier).skip(),
-                    child: Text(l10n.skip),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 2,
-                  child: FilledButton(
-                    onPressed: () => ref.read(gameProvider.notifier).verify(),
-                    child: Text(l10n.verify),
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ],

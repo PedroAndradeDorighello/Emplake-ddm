@@ -91,7 +91,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get clear => 'Limpar';
 
   @override
-  String get nextPuzzle => 'Próximo';
+  String get nextPuzzle => 'Avançar';
+
+  @override
+  String get showSolutionSteps => 'Ver resolução';
+
+  @override
+  String get hideSolutionSteps => 'Ocultar resolução';
 
   @override
   String get correct => 'Correto! A equação é verdadeira.';
@@ -117,6 +123,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get latexPreview => 'Prévia LaTeX';
 
   @override
+  String get copyLatex => 'Copiar LaTeX';
+
+  @override
+  String get latexCopied => 'LaTeX copiado';
+
+  @override
   String get score => 'Pontuação';
 
   @override
@@ -127,6 +139,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get noSolvedYet => 'Nenhum desafio resolvido ainda.';
+
+  @override
+  String get yourSolution => 'Sua solução';
+
+  @override
+  String get noSolutionSaved => 'Não há solução salva para este número.';
+
+  @override
+  String get tapSolvedHint =>
+      'Toque em um número resolvido para ver a solução.';
 
   @override
   String get loadingProgress => 'Carregando seu progresso…';
